@@ -27,22 +27,19 @@
       <form #bookForm="ngForm" (ngSubmit)="addBook(bookForm)">
         <div class="mb-3">
           <input
-            [(ngModel)]="title"
-            name="title"
+            [(ngModel)]="name"
+            name="name"
             class="form-control"
-            placeholder="Title (min 3 letters)"
+            placeholder="name (min 3 letters)"
             required
             minlength="3"
-            #titleInput="ngModel"
+            #nameInput="ngModel"
           />
-          <div *ngIf="titleInput.invalid && titleInput.touched" class="text-danger">
-            Title must be at least 3 characters.
+          <div *ngIf="nameInput.invalid && nameInput.touched" class="text-danger">
+            name must be at least 3 characters.
           </div>
         </div>
 
-        <div class="mb-3">
-          <textarea [(ngModel)]="description" name="description" placeholder="Description" class="form-control"></textarea>
-        </div>
 
         <div class="mb-3">
           <input
@@ -52,7 +49,7 @@
             class="form-control"
             placeholder="Quantity"
             required
-            min="1"
+            min="0"
           />
         </div>
 

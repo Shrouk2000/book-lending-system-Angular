@@ -14,34 +14,33 @@ export class LoginComponent {
   email = '';
   password = '';
   errorMessage = '';
+  loading=false
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  login() {
-  console.log('Logging in with:', this.email, this.password);
+login() {
+  this.errorMessage = '';
+  this.loading = true;
+  const email = this.email;
+  const password = this.password;
+  console.log('Logging in with:', email, password);
 
-  this.auth.login({ email: this.email, password: this.password }).subscribe({
+  this.auth.login({ email, password }).subscribe({
     next: (res: any) => {
-      if (!res.token) {
-        this.errorMessage = 'Login failed: No token returned';
-        return;
-      }
-
+      this.loading = false;
       this.auth.setToken(res.token);
-
-      try {
-        const decoded = JSON.parse(atob(res.token.split('.')[1]));
-        const role = decoded.role;
-        console.log('Login successful, role:', role);
-        this.router.navigate([role === 'Admin' ? '/admin' : '/']);
-      } catch (e) {
-        console.error('Token decoding failed', e);
-        this.errorMessage = 'Login failed: Invalid token';
-      }
+      const decoded = JSON.parse(atob(res.token.split('.')[1]));
+      const role = decoded.role;
+      this.router.navigate([role === 'Admin' ? '/admin' : '/']);
     },
     error: (err) => {
+      this.loading = false;
       console.error('Login error:', err);
-      this.errorMessage = err?.error?.message || 'Invalid email or password';
+      if (err.status === 400) {
+        this.errorMessage = 'Invalid email or password. Please try again.';
+      } else {
+        this.errorMessage = 'Something went wrong. Try again later.';
+      }
     }
   });
 }

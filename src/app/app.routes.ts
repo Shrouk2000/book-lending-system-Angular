@@ -10,4 +10,5 @@ export const routes: Routes = [
  { path: 'register', component: RegisterComponent },
    { path: 'borrowed', component: MyBorrowedBooksComponent },
    { path: 'admin', component: AdminBookManagementComponent },
+     { path: 'my-books', component: MyBorrowedBooksComponent }
 ];

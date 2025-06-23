@@ -13,6 +13,10 @@ export class MyBorrowedBooksComponent implements OnInit {
   private bookService = inject(BookService);
 
   ngOnInit(): void {
+    this.loadBooks();
+  }
+
+  loadBooks() {
     this.bookService.getMyBorrowedBooks().subscribe({
       next: res => this.books = res,
       error: err => console.error('Error loading borrowed books:', err)
@@ -21,8 +25,7 @@ export class MyBorrowedBooksComponent implements OnInit {
 
   return(bookId: string) {
     this.bookService.returnBook(bookId).subscribe(() => {
-      alert('Book returned!');
-      this.ngOnInit();
+      this.loadBooks();
     });
   }
 }

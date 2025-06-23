@@ -23,37 +23,32 @@ export class BookListComponent implements OnInit {
   loadBooks(): void {
   this.bookService.getAllBooks().subscribe({
     next: (res: any) => {
-      console.log('✅ Books received from API:', res);
+      console.log('Books received from API:', res);
       this.books = res.items;
     },
     error: (err) => {
-      console.error('❌ Error fetching books:', err);
+      console.error(' Error fetching books:', err);
     }
   });
 }
 
 
-  borrow(bookId: string): void {
-    this.bookService.borrowBook(bookId).subscribe({
-      next: () => {
-        alert('📚 Book borrowed successfully!');
-        this.loadBooks();
-      },
-      error: () => {
-        alert('❌ Failed to borrow this book.');
-      }
-    });
-  }
+ borrow(id: string) {
+  this.bookService.borrowBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+    },
+    error: () => alert('Failed to borrow book.')
+  });
+}
 
-  return(bookId: string): void {
-    this.bookService.returnBook(bookId).subscribe({
-      next: () => {
-        alert('✅ Book returned successfully!');
-        this.loadBooks();
-      },
-      error: () => {
-        alert('❌ Failed to return this book.');
-      }
-    });
-  }
+return(id: string) {
+  this.bookService.returnBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+    },
+    error: () => alert('Failed to return book.')
+  });
+}
+
 }

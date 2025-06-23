@@ -1,4 +1,36 @@
-<div class="container mt-5">
-  <h1 class="text-primary">Welcome to the Book Lending System</h1>
-  <a routerLink="/login" class="btn btn-outline-primary">Go to Login</a>
+<div class="container mt-4">
+  <h2>📚 Book List</h2>
+
+  <div *ngIf="isLoading">Loading books...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div *ngIf="books.length === 0 && !isLoading" class="text-muted">
+    No books found.
+  </div>
+
+  <div class="row" *ngIf="books.length > 0">
+    <div class="col-md-4 mb-3" *ngFor="let book of books">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ book.title }}</h5>
+          <p class="card-text">{{ book.description || 'No description available.' }}</p>
+
+          <!-- Show availability status -->
+          <p>
+            <strong>Status:</strong>
+            <span [ngClass]="{
+              'text-success': book.isAvailable,
+              'text-danger': !book.isAvailable
+            }">
+              {{ book.isAvailable ? 'Available' : 'Not Available' }}
+            </span>
+          </p>
+
+          <!-- Always show Borrow/Return buttons for now -->
+          <button class="btn btn-primary btn-sm me-2" (click)="borrow(book.id)">Borrow</button>
+          <button class="btn btn-warning btn-sm" (click)="return(book.id)">Return</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

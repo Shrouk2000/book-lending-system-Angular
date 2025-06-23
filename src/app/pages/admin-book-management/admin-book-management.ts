@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { BookService } from '../../services/book.service';
@@ -11,26 +11,27 @@ import { BookService } from '../../services/book.service';
 })
 export class AdminBookManagementComponent {
   name = '';
-  // description = '';
   quantity = 1;
-
+ books: any[] = [];
   message = '';
   messageType: 'success' | 'error' = 'success';
 
   constructor(private bookService: BookService) {}
-
+ngOnInit():void{
+  this.loadBooks();
+}
   addBook(form: NgForm) {
     const trimmedname = this.name.trim();
     const qty = +this.quantity;
 
-    // if (trimmedname.length < 3 || qty < 1) {
-    //   this.showMessage(' name must be at least 3 characters and quantity ≥ 1', 'error');
-    //   return;
-    // }
+    if (trimmedname.length < 3 || qty < 1) {
+      this.showMessage(' name must be at least 3 characters and quantity ≥ 1', 'error');
+      return;
+    }
 
     const book = {
       Name: trimmedname,
-      // Description: this.description || '',
+    
       Quantity: qty,
       IsAvailable: true
     };
@@ -54,10 +55,33 @@ export class AdminBookManagementComponent {
       }
     });
   }
+  loadBooks() {
+  this.bookService.getAllBooks().subscribe({
+    next: (res: any) => {
+      this.books = res;
+    },
+    error: () => {
+      this.showMessage(' Failed to load books', 'error');
+    }
+  });
+}
+
+deleteBook(bookId: number) {
+  if (confirm('Are you sure you want to delete this book?')) {
+    this.bookService.deleteBook(bookId).subscribe({
+      next: () => {
+        this.showMessage(' Book deleted!', 'success');
+        this.loadBooks(); 
+      },
+      error: () => this.showMessage(' Failed to delete book', 'error')
+    });
+  }
+}
 
   showMessage(msg: string, type: 'success' | 'error' = 'success') {
     this.message = msg;
     this.messageType = type;
     setTimeout(() => (this.message = ''), 4000);
   }
+  
 }

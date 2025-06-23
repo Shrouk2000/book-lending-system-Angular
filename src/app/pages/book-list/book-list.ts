@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookService } from '../../services/book.service';
 import { RouterModule } from '@angular/router';
+import { BookService } from '../../services/book.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-book-list',
@@ -13,42 +14,48 @@ export class BookListComponent implements OnInit {
   books: any[] = [];
   isLoading = false;
   errorMessage = '';
+  isAdmin = false;
 
-  private bookService = inject(BookService);
+  constructor(private bookService: BookService, private auth: AuthService) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.auth.getRole() === 'Admin';
     this.loadBooks();
   }
 
   loadBooks(): void {
-  this.bookService.getAllBooks().subscribe({
-    next: (res: any) => {
-      console.log('Books received from API:', res);
-      this.books = res.items;
-    },
-    error: (err) => {
-      console.error(' Error fetching books:', err);
+    this.bookService.getAllBooks().subscribe({
+      next: (res: any) => {
+        console.log('Books received from API:', res);
+        this.books = res.items;
+      },
+      error: (err) => {
+        console.error('Error fetching books:', err);
+        this.errorMessage = 'Failed to load books.';
+      }
+    });
+  }
+
+  borrow(id: string) {
+    this.bookService.borrowBook(id).subscribe({
+      next: () => this.loadBooks(),
+      error: () => alert('Failed to borrow book.')
+    });
+  }
+
+  return(id: string) {
+    this.bookService.returnBook(id).subscribe({
+      next: () => this.loadBooks(),
+      error: () => alert('Failed to return book.')
+    });
+  }
+
+  deleteBook(id: number) {
+    if (confirm('Are you sure you want to delete this book?')) {
+      this.bookService.deleteBook(id).subscribe({
+        next: () => this.loadBooks(),
+        error: () => alert('Failed to delete book.')
+      });
     }
-  });
-}
-
-
- borrow(id: string) {
-  this.bookService.borrowBook(id).subscribe({
-    next: () => {
-      this.loadBooks();
-    },
-    error: () => alert('Failed to borrow book.')
-  });
-}
-
-return(id: string) {
-  this.bookService.returnBook(id).subscribe({
-    next: () => {
-      this.loadBooks();
-    },
-    error: () => alert('Failed to return book.')
-  });
-}
-
+  }
 }

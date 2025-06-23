@@ -34,7 +34,7 @@ addBook(book: any): Observable<any> {
   return this.http.post('https://booklending-api-raghda-test.jahezteam.com/api/Book', book);
 }
 
-  deleteBook(bookId: string) {
-    return this.http.delete(`${this.baseUrl}?bookId=${bookId}`);
-  }
+deleteBook(bookId: number) {
+  return this.http.delete(`https://booklending-api-raghda-test.jahezteam.com/api/Book?bookId=${bookId}`);
+}
 }

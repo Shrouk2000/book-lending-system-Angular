@@ -36,19 +36,30 @@ export class BookListComponent implements OnInit {
     });
   }
 
-  borrow(id: string) {
-    this.bookService.borrowBook(id).subscribe({
-      next: () => this.loadBooks(),
-      error: () => alert('Failed to borrow book.')
-    });
-  }
+ borrow(id: number) {
+  this.bookService.borrowBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+    },
+    error: (err) => {
+      console.error('Borrow failed:', err);
+      this.errorMessage = 'Failed to borrow the book.';
+    }
+  });
+}
 
-  return(id: string) {
-    this.bookService.returnBook(id).subscribe({
-      next: () => this.loadBooks(),
-      error: () => alert('Failed to return book.')
-    });
-  }
+return(id: number) {
+  this.bookService.returnBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+    },
+    error: (err) => {
+      console.error('Return failed:', err);
+      this.errorMessage = 'Failed to return the book.';
+    }
+  });
+}
+
 
   deleteBook(id: number) {
     if (confirm('Are you sure you want to delete this book?')) {

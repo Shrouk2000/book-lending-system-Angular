@@ -13,13 +13,20 @@ export class BookService {
     return this.http.get(`${this.baseUrl}/GetBooks`);
   }
 
-  borrowBook(bookId: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}`, {});
-  }
+  borrowBook(bookId: number) {
+  return this.http.post(
+    `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/Borrow?bookId=${bookId}`,
+    {}
+  );
+}
 
-  returnBook(bookId: string): Observable<any> {
-    return this.http.put(`https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`, {});
-  }
+  // Return a book
+returnBook(bookId: number) {
+  return this.http.put(
+    `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`,
+    {}
+  );
+}
 
   getBookById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/GetBook?id=${id}`);

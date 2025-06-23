@@ -1,0 +1,6 @@
+<h2>📚 My Borrowed Books</h2>
+<div *ngFor="let book of books" class="card m-2 p-3">
+  <h4>{{ book.title }}</h4>
+  <p><strong>Borrow Date:</strong> {{ book.borrowDate | date }}</p>
+  <button class="btn btn-warning" (click)="return(book.bookId)">Return</button>
+</div>

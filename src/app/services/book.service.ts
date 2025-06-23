@@ -28,4 +28,8 @@ export class BookService {
   getBookById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/GetBook?id=${id}`);
   }
+ getMyBorrowedBooks(): Observable<any[]> {
+  return this.http.get<any[]>('https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplaybooksforOneMember');
+}
+
 }

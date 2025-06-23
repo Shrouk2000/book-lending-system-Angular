@@ -19,30 +19,30 @@ export class LoginComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
 login() {
-  this.errorMessage = '';
-  this.loading = true;
-  const email = this.email;
-  const password = this.password;
-  console.log('Logging in with:', email, password);
+  if (!this.email || !this.password) {
+    this.errorMessage = 'Email and password are required.';
+    return;
+  }
 
-  this.auth.login({ email, password }).subscribe({
+  const credentials = {
+    email: this.email.trim(),
+    password: this.password
+  };
+
+  this.auth.login(credentials).subscribe({
     next: (res: any) => {
-      this.loading = false;
       this.auth.setToken(res.token);
       const decoded = JSON.parse(atob(res.token.split('.')[1]));
       const role = decoded.role;
       this.router.navigate([role === 'Admin' ? '/admin' : '/']);
     },
     error: (err) => {
-      this.loading = false;
       console.error('Login error:', err);
-      if (err.status === 400) {
-        this.errorMessage = 'Invalid email or password. Please try again.';
-      } else {
-        this.errorMessage = 'Something went wrong. Try again later.';
-      }
+      this.errorMessage = err.error || 'Login failed. Please check your credentials.';
     }
   });
 }
+
+
 
 }

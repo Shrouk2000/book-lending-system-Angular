@@ -1,33 +1,12 @@
-<div class="container mt-5">
-  <h2>Register</h2>
-
-  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+<div class="container mt-4">
+  <h3>👤 Register</h3>
 
   <form (ngSubmit)="register()">
-    <div class="mb-3">
-      <label>Name</label>
-      <input type="text" class="form-control" [(ngModel)]="name" name="name" required>
-    </div>
+  <input [(ngModel)]="username" name="username" placeholder="Username" required>
+  <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required>
+  <input [(ngModel)]="password" name="password" type="password" placeholder="Password" required>
+  <input [(ngModel)]="phoneNumber" name="phoneNumber" placeholder="+201234567890" required>
+  <button type="submit">Register</button>
+</form>
 
-    <div class="mb-3">
-      <label>Email</label>
-      <input type="email" class="form-control" [(ngModel)]="email" name="email" required>
-    </div>
-
-    <div class="mb-3">
-      <label>Password</label>
-      <input type="password" class="form-control" [(ngModel)]="password" name="password" required>
-    </div>
-
-    <!-- <div class="mb-3">
-      <label>Role</label>
-      <select class="form-control" [(ngModel)]="role" name="role">
-        <option value="Member">Member</option>
-        <option value="Admin">Admin</option>
-      </select>
-    </div> -->
-
-    <button type="submit" class="btn btn-success">Register</button>
-  </form>
 </div>

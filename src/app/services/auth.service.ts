@@ -10,16 +10,21 @@ export class AuthService {
   private router = inject(Router);
   private apiUrl = 'https://booklending-api-raghda-test.jahezteam.com/api/Account';
 
-  login(credentials: { email: string, password: string }) {
-    return this.http.post(`${this.apiUrl}/login`, credentials);
+
+  login(credentials: { email: string; password: string }) {
+    return this.http.post(`${this.apiUrl}/login`, {
+      email: credentials.email.trim(),
+      password: credentials.password.trim()
+    });
   }
 
+ 
   register(userData: any) {
     return this.http.post(`${this.apiUrl}/register`, {
-      Name: userData.name,
-      Email: userData.email,
-      Password: userData.password,
-      Role: userData.role
+      username: userData.username.trim(),
+      email: userData.email.trim(),
+      password: userData.password,
+      phoneNumber: userData.phoneNumber.trim()
     });
   }
 
@@ -31,14 +36,15 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
+
+isLoggedIn(): boolean {
+  return !!localStorage.getItem('token');
+}
+
 
   getRole(): string {
   const token = this.getToken();

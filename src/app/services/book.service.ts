@@ -9,27 +9,32 @@ export class BookService {
   private http = inject(HttpClient);
   private baseUrl = 'https://booklending-api-raghda-test.jahezteam.com/api/Book';
 
- 
   getAllBooks(): Observable<any> {
     return this.http.get(`${this.baseUrl}/GetBooks`);
   }
-
 
   borrowBook(bookId: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}`, {});
   }
 
- 
   returnBook(bookId: string): Observable<any> {
-    return this.http.put(`https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`,{});
+    return this.http.put(`https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`, {});
   }
 
-  
   getBookById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/GetBook?id=${id}`);
   }
- getMyBorrowedBooks(): Observable<any[]> {
-  return this.http.get<any[]>('https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplaybooksforOneMember');
+
+  getMyBorrowedBooks(): Observable<any[]> {
+    return this.http.get<any[]>('https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplaybooksforOneMember');
+  }
+
+
+addBook(book: any): Observable<any> {
+  return this.http.post('https://booklending-api-raghda-test.jahezteam.com/api/Book', book);
 }
 
+  deleteBook(bookId: string) {
+    return this.http.delete(`${this.baseUrl}?bookId=${bookId}`);
+  }
 }

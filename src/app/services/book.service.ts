@@ -16,12 +16,12 @@ export class BookService {
 
 
   borrowBook(bookId: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/BorrowBook?bookId=${bookId}`, {});
+    return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}`, {});
   }
 
  
   returnBook(bookId: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/ReturnBook?bookId=${bookId}`, {});
+    return this.http.put(`https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`,{});
   }
 
   

@@ -26,9 +26,9 @@
             </span>
           </p>
 
-          <!-- Always show Borrow/Return buttons for now -->
-          <button class="btn btn-primary btn-sm me-2" (click)="borrow(book.id)">Borrow</button>
-          <button class="btn btn-warning btn-sm" (click)="return(book.id)">Return</button>
+        
+          <button *ngIf="book.isAvailable" class="btn btn-primary btn-sm me-2" (click)="borrow(book.id)">Borrow</button>
+          <button *ngIf="!book.isAvailable" class="btn btn-warning btn-sm" (click)="return(book.id)">Return</button>
         </div>
       </div>
     </div>

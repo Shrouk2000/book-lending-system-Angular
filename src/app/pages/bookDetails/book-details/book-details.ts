@@ -28,7 +28,7 @@ export class BookDetailsComponent implements OnInit {
         this.book = res;
       },
       error: () => {
-        this.errorMessage = 'Failed to load book details.';
+        this.errorMessage = 'Failed t o load book details.';
       }
     });
   }

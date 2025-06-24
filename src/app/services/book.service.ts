@@ -7,35 +7,35 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class BookService {
-  private baseUrl = 'https://booklending-api-raghda-test.jahezteam.com/api/Book';
+  private baseUrl = 'https://booklending-api-raghda-test.jahezteam.com/api';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   getAllBooks(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetBooks`);
+    return this.http.get(`${this.baseUrl}/Book/GetBooks`);
   }
 
   borrowBook(bookId: number): Observable<any> {
     return this.http.post(
-      `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/Borrow?bookId=${bookId}`,
+      `${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}`,
       {}
     );
   }
 
   returnBook(bookId: number): Observable<any> {
     return this.http.put(
-      `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/ReturnBook?bookId=${bookId}`,
+      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}`,
       {}
     );
   }
 
   getBookById(id: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetBook?id=${id}`);
+    return this.http.get(`${this.baseUrl}/Book/GetBook?id=${id}`);
   }
 
 getMyBorrowedBooks(): Observable<any[]> {
   return this.http.get<any[]>(
-    `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplaybooksforOneMember`
+    `${this.baseUrl}/BorrowBook/DisplaybooksforOneMember`
   );
 }
 
@@ -46,6 +46,19 @@ getMyBorrowedBooks(): Observable<any[]> {
   }
 
   deleteBook(bookId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}?bookId=${bookId}`);
+    return this.http.delete(`${this.baseUrl}/Book?bookId=${bookId}`);
   }
+
+updateBook(book: any): Observable<any> {
+  return this.http.put(
+    `https://booklending-api-raghda-test.jahezteam.com/api/Book?bookId=${book.bookId}`, 
+    {
+      name: book.name,
+      quantity: book.quantity,
+      isDeleted: false
+    }
+  );
+}
+
+
 }

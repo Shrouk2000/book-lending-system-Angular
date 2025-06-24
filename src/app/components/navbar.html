@@ -1,29 +1,44 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-  <a class="navbar-brand" routerLink="/">📚 Book Lending</a>
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/"> Book Lending</a>
 
-  <div class="collapse navbar-collapse">
-    <ul class="navbar-nav me-auto">
-      <li class="nav-item"><a class="nav-link" routerLink="/">Home</a></li>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <li *ngIf="isMember" class="nav-item">
-        <a class="nav-link" routerLink="/borrowed">My Borrowed Books</a>
-      </li>
+  
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/">Home</a>
+        </li>
 
-      <li *ngIf="isAdmin" class="nav-item">
-        <a class="nav-link" routerLink="/admin">Admin Panel</a>
-      </li>
+        <li *ngIf="isMember" class="nav-item">
+          <a class="nav-link" routerLink="/borrowed">My Borrowed Books</a>
+        </li>
 
-      <li *ngIf="isAdmin" class="nav-item">
-        <a class="nav-link" routerLink="/delayed-books">Delayed Books</a>
-      </li>
-    </ul>
+        <li *ngIf="isAdmin" class="nav-item">
+          <a class="nav-link" routerLink="/admin">Admin Panel</a>
+        </li>
 
-    <ul class="navbar-nav ms-auto">
-      <li *ngIf="!isLoggedIn" class="nav-item"><a class="nav-link" routerLink="/login">Login</a></li>
-      <li *ngIf="!isLoggedIn" class="nav-item"><a class="nav-link" routerLink="/register">Register</a></li>
-      <li *ngIf="isLoggedIn" class="nav-item">
-        <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
-      </li>
-    </ul>
+        <li *ngIf="isAdmin" class="nav-item">
+          <a class="nav-link" routerLink="/delayed-books">Delayed Books</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li *ngIf="!isLoggedIn" class="nav-item">
+          <a class="nav-link" routerLink="/login">Login</a>
+        </li>
+        <li *ngIf="!isLoggedIn" class="nav-item">
+          <a class="nav-link" routerLink="/register">Register</a>
+        </li>
+        <li *ngIf="isLoggedIn" class="nav-item">
+          <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>

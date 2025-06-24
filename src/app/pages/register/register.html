@@ -1,12 +1,53 @@
 <div class="container mt-4">
-  <h3>👤 Register</h3>
+  <h3><i class="bi bi-person-plus-fill me-2"></i> Register</h3>
 
-  <form (ngSubmit)="register()">
-  <input [(ngModel)]="username" name="username" placeholder="Username" required>
-  <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required>
-  <input [(ngModel)]="password" name="password" type="password" placeholder="Password" required>
-  <input [(ngModel)]="phoneNumber" name="phoneNumber" placeholder="+201234567890" required>
-  <button type="submit">Register</button>
-</form>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-2">
+    {{ errorMessage }}
+  </div>
 
+  <form (ngSubmit)="register()" #registerForm="ngForm" class="mt-3">
+    <div class="mb-3">
+      <input
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Username"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <div class="mb-3">
+      <input
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        placeholder="Email"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <div class="mb-3">
+      <input
+        [(ngModel)]="password"
+        name="password"
+        type="password"
+        placeholder="Password (min 6 chars, uppercase, number, special char)"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <div class="mb-3">
+      <input
+        [(ngModel)]="phoneNumber"
+        name="phoneNumber"
+        placeholder="+201234567890"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
 </div>

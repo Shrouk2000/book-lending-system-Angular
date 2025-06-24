@@ -15,16 +15,17 @@ export class BookService {
     return this.http.get(`${this.baseUrl}/Book/GetBooks`);
   }
 
-  borrowBook(bookId: number): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}`,
-      {}
-    );
+ borrowBook(bookId: number): Observable<any> {
+    const userId = this.authService.getUserId(); // get ID from JWT
+    const body = { userId, bookId };
+    return this.http.post(`${this.baseUrl}/BorrowBook/Borrow`, body);
   }
 
+
   returnBook(bookId: number): Observable<any> {
+    const userId=this.authService.getUserId(); //get logged in user's Id
     return this.http.put(
-      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}`,
+      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}$userId=${userId}`,
       {}
     );
   }
@@ -34,10 +35,13 @@ export class BookService {
   }
 
 getMyBorrowedBooks(): Observable<any[]> {
+  const userId = this.authService.getUserId();
   return this.http.get<any[]>(
-    `${this.baseUrl}/BorrowBook/DisplaybooksforOneMember`
+    `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`
   );
 }
+
+
 
 
 

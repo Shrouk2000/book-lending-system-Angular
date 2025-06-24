@@ -1,10 +1,8 @@
 <div class="container my-4">
   <h2 class="mb-4">Book List</h2>
 
-  <!-- Error -->
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <!-- Books -->
   <div *ngFor="let book of books" class="card mb-3 shadow-sm">
     <div class="card-body d-flex justify-content-between align-items-start">
       <div>
@@ -19,37 +17,36 @@
       </div>
 
       <div class="d-flex gap-2 flex-column flex-md-row align-items-start align-items-md-center">
-        <!-- Borrow button -->
-        <button 
-          *ngIf="book.quantity > 0 && !hasBorrowedThisBook(book.id) && !hasAnyBorrowedBook()" 
-          (click)="borrow(book.id)" 
-          class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-arrow-down-circle"></i> Borrow
-        </button>
 
-        <!-- Return button -->
-        <button 
-          *ngIf="hasBorrowedThisBook(book.id)" 
-          (click)="return(book.id)" 
-          class="btn btn-outline-warning btn-sm">
-          <i class="bi bi-arrow-return-left"></i> Return
-        </button>
+       <!-- Borrow Button -->
+<button 
+  *ngIf="book.quantity > 0 && !hasBorrowedThisBook(book.id) && !hasAnyBorrowedBook()" 
+  (click)="borrow(book.id)" 
+  class="btn btn-outline-primary btn-sm">
+  <i class="bi bi-arrow-down-circle"></i> Borrow
+</button>
 
-        <!-- Delete button for Admin -->
+<!-- Return Button -->
+<button 
+  *ngIf="hasBorrowedThisBook(book.id)" 
+  (click)="return(book.id)" 
+  class="btn btn-outline-warning btn-sm">
+  <i class="bi bi-arrow-return-left"></i> Return
+</button>
+
         <button *ngIf="isAdmin && editModeId !== book.id"
                 class="btn btn-outline-danger btn-sm" 
                 (click)="deleteBook(book.id)">
           <i class="bi bi-trash"></i> Delete
         </button>
 
-        <!-- Edit button for Admin -->
         <button *ngIf="isAdmin && editModeId !== book.id"
                 class="btn btn-outline-info btn-sm"
                 (click)="startEdit(book)">
           <i class="bi bi-pencil"></i> Edit
         </button>
 
-        <!-- Edit form for Admin -->
+    
         <div *ngIf="editModeId === book.id" class="w-100">
           <form (ngSubmit)="saveEdit()" class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center">
             <input

@@ -1,8 +1,7 @@
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookService } from '../../services/book.service';
 import { RouterModule } from '@angular/router';
+import { BookService } from '../../services/book.service';
 
 @Component({
   selector: 'app-my-borrowed-books',
@@ -23,7 +22,9 @@ export class MyBorrowedBooksComponent implements OnInit {
   loadBorrowedBooks() {
     this.bookService.getMyBorrowedBooks().subscribe({
       next: (res: any) => {
+        console.log('Borrowed Books:', res);
         this.books = res?.items || res || [];
+         console.log('Loaded borrowed books:', this.books); 
       },
       error: () => {
         this.errorMessage = 'Failed to load borrowed books.';

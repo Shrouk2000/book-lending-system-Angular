@@ -58,10 +58,11 @@ getUserId(): string {
   const token = this.getToken();
   if (!token) return '';
   const payload = JSON.parse(atob(token.split('.')[1]));
-  console.log('User ID:', payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']);
   return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 }
 
 
-
+// get isMember(): boolean {
+//   return this.auth.getRole() === 'Member';
+// }
 }

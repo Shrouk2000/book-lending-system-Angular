@@ -15,10 +15,9 @@
           <a class="nav-link" routerLink="/">Home</a>
         </li>
 
-        <li *ngIf="isMember" class="nav-item">
-          <a class="nav-link" routerLink="/borrowed">My Borrowed Books</a>
-        </li>
-
+       <li *ngIf="isMember" class="nav-item">
+  <a class="nav-link" routerLink="/borrowed">My Borrowed Books</a>
+</li>
         <li *ngIf="isAdmin" class="nav-item">
           <a class="nav-link" routerLink="/admin">Admin Panel</a>
         </li>

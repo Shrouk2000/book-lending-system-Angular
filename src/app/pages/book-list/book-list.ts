@@ -39,7 +39,7 @@ export class BookListComponent implements OnInit {
   loadBooks(): void {
     this.bookService.getAllBooks().subscribe({
       next: (res: any) => {
-        this.books = res.items;
+        this.books = res.items || res ||[];
       },
       error: (err) => {
         this.errorMessage = 'Failed to load books.';
@@ -51,46 +51,48 @@ export class BookListComponent implements OnInit {
   loadBorrowedBooks(): void {
     this.bookService.getMyBorrowedBooks().subscribe({
       next: (res: any) => {
-        this.borrowedBooks = res?.items || res || [];
+        this.borrowedBooks = res?.items || res?.data||res || [];
+          console.log('📘 Borrowed books:', this.borrowedBooks); 
       },
       error: () => {
         this.borrowedBooks = [];
       }
     });
   }
+hasBorrowedThisBook(bookId: number): boolean {
+  return this.borrowedBooks.some(b => b.bookId === bookId || b.id === bookId);
+}
 
-  hasBorrowedThisBook(bookId: number): boolean {
-    return this.borrowedBooks.some(b => b.id === bookId);
+
+hasAnyBorrowedBook(): boolean {
+  return this.borrowedBooks.length > 0;
+}
+
+
+ borrow(id: number) {
+  if (this.hasAnyBorrowedBook()) {
+    alert('You must return your current borrowed book before borrowing another.');
+    return;
   }
 
-  hasAnyBorrowedBook(): boolean {
-    return this.borrowedBooks.length > 0;
-  }
+  this.bookService.borrowBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+      this.loadBorrowedBooks(); //  updates Return button
+    },
+    error: () => alert('Failed to borrow book.')
+  });
+}
 
-  borrow(id: number) {
-    if (this.hasAnyBorrowedBook()) {
-      alert('You must return your current borrowed book before borrowing another.');
-      return;
-    }
-
-    this.bookService.borrowBook(id).subscribe({
-      next: () => {
-        this.loadBooks();
-        this.loadBorrowedBooks();
-      },
-      error: () => alert('Failed to borrow book.')
-    });
-  }
-
-  return(id: number) {
-    this.bookService.returnBook(id).subscribe({
-      next: () => {
-        this.loadBooks();
-        this.loadBorrowedBooks();
-      },
-      error: () => alert('Failed to return book.')
-    });
-  }
+return(id: number) {
+  this.bookService.returnBook(id).subscribe({
+    next: () => {
+      this.loadBooks();
+      this.loadBorrowedBooks(); //  updates Borrow button
+    },
+    error: () => alert('Failed to return book.')
+  });
+}
 
   deleteBook(id: number) {
     if (confirm('Are you sure you want to delete this book?')) {

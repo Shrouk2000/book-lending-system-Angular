@@ -19,23 +19,27 @@ export class BookService {
     const userId = this.authService.getUserId(); // get ID from JWT
     const body = { userId, bookId };
     return this.http.post(`${this.baseUrl}/BorrowBook/Borrow`, body);
+    // return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}&userId=${userId}`, {});
+
   }
 
 
   returnBook(bookId: number): Observable<any> {
     const userId=this.authService.getUserId(); //get logged in user's Id
     return this.http.put(
-      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}$userId=${userId}`,
+      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}&userId=${userId}`,
       {}
     );
   }
 
   getBookById(id: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/Book/GetBook?id=${id}`);
+    return this.http.get(`${this.baseUrl}/Book/GetBook?bookId=${id}`);
   }
 
 getMyBorrowedBooks(): Observable<any[]> {
   const userId = this.authService.getUserId();
+  
+  console.log(userId);
   return this.http.get<any[]>(
     `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`
   );
@@ -46,7 +50,7 @@ getMyBorrowedBooks(): Observable<any[]> {
 
 
   addBook(book: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}`, book);
+    return this.http.post(`${this.baseUrl}/Book`, book);
   }
 
   deleteBook(bookId: number): Observable<any> {

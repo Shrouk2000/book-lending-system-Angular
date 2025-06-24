@@ -34,7 +34,7 @@ login() {
       this.auth.setToken(res.token);
       const decoded = JSON.parse(atob(res.token.split('.')[1]));
       const role = decoded.role;
-      this.router.navigate([role === 'Admin' ? '/admin' : '/']);
+      this.router.navigate([role === 'Admin' ? '/admin' : '/book-list']);
     },
     error: (err) => {
       console.error('Login error:', err);

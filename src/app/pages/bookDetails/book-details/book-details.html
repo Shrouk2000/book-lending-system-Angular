@@ -1,0 +1,19 @@
+<div class="container mt-4" *ngIf="book">
+  <h2>{{ book.name }}</h2>
+  <p><strong>Quantity:</strong> {{ book.quantity }}</p>
+  <p><strong>Description:</strong> {{ book.description || 'No description provided.' }}</p>
+
+  <span class="badge" [ngClass]="{
+    'bg-success': book.quantity > 0,
+    'bg-danger': book.quantity <= 0
+  }">
+    {{ book.quantity > 0 ? 'Available' : 'Not Available' }}
+  </span>
+
+  <br /><br />
+  <a class="btn btn-secondary" routerLink="/book-list">Back to List</a>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger mt-3">
+  {{ errorMessage }}
+</div>

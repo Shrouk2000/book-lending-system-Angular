@@ -21,6 +21,7 @@ export class BookListComponent implements OnInit {
   books: any[] = [];
   borrowedBooks: any[] = [];
   isAdmin = false;
+  isLoggedIn = false;
   errorMessage = '';
   editModeId: number | null = null;
   editBookData: EditableBook = { id: 0, name: '', quantity: 0 };
@@ -32,6 +33,7 @@ export class BookListComponent implements OnInit {
 
   ngOnInit(): void {
     this.isAdmin = this.auth.getRole() === 'Admin';
+      this.isLoggedIn = this.auth.isLoggedIn(); 
     this.loadBooks();
     this.loadBorrowedBooks();
   }

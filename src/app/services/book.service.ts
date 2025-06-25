@@ -23,14 +23,19 @@ export class BookService {
 
   }
 
+returnBook(bookId: number): Observable<any> {
+  const userId = this.authService.getUserId();
+  console.log('Returning bookId:', bookId, 'for userId:', userId);
 
-  returnBook(bookId: number): Observable<any> {
-    const userId=this.authService.getUserId(); //get logged in user's Id
-    return this.http.put(
-      `${this.baseUrl}/BorrowBook/ReturnBook?bookId=${bookId}&userId=${userId}`,
-      {}
-    );
-  }
+  return this.http.put(
+    
+    `${this.baseUrl}/BorrowBook/ReturnBook?BookId=${bookId}&userId=${userId}`,
+    {},{ responseType: 'text' }
+    
+  );
+}
+
+
 
   getBookById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/Book/GetBook?bookId=${id}`);
@@ -41,14 +46,14 @@ getMyBorrowedBooks(): Observable<any[]> {
   
   console.log(userId);
   return this.http.get<any[]>(
-    `https://booklending-api-raghda-test.jahezteam.com/api/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`
+     `${this.baseUrl}/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`
   );
 }
-
-
-
-
-
+getAllBorrowedBooks(): Observable<any[]> {
+  return this.http.get<any[]>(
+    `${this.baseUrl}/BorrowBook/GetAllNotReturnedBooks`
+  );
+}
   addBook(book: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/Book`, book);
   }

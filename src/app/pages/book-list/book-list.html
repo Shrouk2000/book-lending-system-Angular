@@ -19,19 +19,18 @@
       <div class="d-flex gap-2 flex-column flex-md-row align-items-start align-items-md-center">
 
       
-<button
-  *ngIf="isLoggedIn && book.quantity > 0 && !hasBorrowedThisBook(book.id) && !hasAnyBorrowedBook()"
-  (click)="borrow(book.id)"
+<button 
+  *ngIf="book.quantity > 0 && !hasBorrowedThisBook(book.id)" 
+  (click)="borrow(book.id)" 
   class="btn btn-outline-primary btn-sm">
-  <i class="bi bi-arrow-down-circle"></i> Borrow
+  Borrow
 </button>
 
-<!-- Return button -->
-<button
-  *ngIf="isLoggedIn && hasBorrowedThisBook(book.id)"
-  (click)="return(book.id)"
+<button 
+  *ngIf="hasBorrowedThisBook(book.id)" 
+  (click)="return(book.id)" 
   class="btn btn-outline-warning btn-sm">
-  <i class="bi bi-arrow-return-left"></i> Return
+  Return
 </button>
 <a [routerLink]="['/details', book.id]" class="btn btn-outline-secondary btn-sm">
   <i class="bi bi-info-circle"></i> Details

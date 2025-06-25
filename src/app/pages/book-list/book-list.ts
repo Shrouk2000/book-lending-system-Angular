@@ -54,17 +54,17 @@ export class BookListComponent implements OnInit {
     this.bookService.getMyBorrowedBooks().subscribe({
       next: (res: any) => {
         this.borrowedBooks = res?.items || res?.data||res || [];
-          console.log('📘 Borrowed books:', this.borrowedBooks); 
+          console.log('Borrowed books:', this.borrowedBooks); 
       },
       error: () => {
         this.borrowedBooks = [];
       }
     });
   }
-hasBorrowedThisBook(bookId: number): boolean {
-  return this.borrowedBooks.some(b => b.bookId === bookId || b.id === bookId);
-}
 
+  hasBorrowedThisBook(bookId: number): boolean {
+    return this.borrowedBooks.some(b => b.bookId === bookId || b.id === bookId);
+  }
 
 hasAnyBorrowedBook(): boolean {
   return this.borrowedBooks.length > 0;
@@ -79,8 +79,13 @@ hasAnyBorrowedBook(): boolean {
 
   this.bookService.borrowBook(id).subscribe({
     next: () => {
-      this.loadBooks();
-      this.loadBorrowedBooks(); //  updates Return button
+      // this.loadBooks();
+      // this.loadBorrowedBooks(); //  updates Return button
+       const borrowed = this.books.find(b => b.id === id);
+      if (borrowed) {
+         borrowed.quantity--;
+        this.borrowedBooks = [{ ...borrowed }]; // Only one book allowed
+      }
     },
     error: () => alert('Failed to borrow book.')
   });
@@ -89,8 +94,10 @@ hasAnyBorrowedBook(): boolean {
 return(id: number) {
   this.bookService.returnBook(id).subscribe({
     next: () => {
-      this.loadBooks();
-      this.loadBorrowedBooks(); //  updates Borrow button
+       this.borrowedBooks = this.borrowedBooks.filter(b => b.bookId !== id && b.id !== id);
+        this.borrowedBooks = [];
+      // this.loadBooks();
+      // this.loadBorrowedBooks(); //  updates Borrow button
     },
     error: () => alert('Failed to return book.')
   });

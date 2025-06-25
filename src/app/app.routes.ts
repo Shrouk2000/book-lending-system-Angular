@@ -6,6 +6,7 @@ import { MyBorrowedBooksComponent } from './my-borrowed-books/my-borrowed-books/
 import { AdminBookManagementComponent } from './pages/admin-book-management/admin-book-management';
 import { BookListComponent } from './pages/book-list/book-list';
 import { BookDetailsComponent } from './pages/bookDetails/book-details/book-details';
+import { DelayedBooksComponent } from './pages/delayed-books/delayed-books';
 export const routes: Routes = [
  { path: '', component: HomeComponent },  
   { path: 'book-list', component: BookListComponent },
@@ -14,5 +15,7 @@ export const routes: Routes = [
  { path: 'register', component: RegisterComponent },
   { path: 'borrowed', component: MyBorrowedBooksComponent },
    { path: 'admin', component: AdminBookManagementComponent },
+   { path: 'delayed-books', component: DelayedBooksComponent },
+
    
 ];

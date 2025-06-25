@@ -73,5 +73,17 @@ updateBook(book: any): Observable<any> {
   );
 }
 
+// For admin: all overdue books
+getAllOverdueBooks(page = 1, pageSize = 10): Observable<any> {
+  return this.http.get(`${this.baseUrl}/BorrowBook/DisplaybooksOverDue?pageNumber=${page}&pageSize=${pageSize}`);
+}
+
+// For members: their own overdue books
+getMyOverdueBooks(): Observable<any> {
+  const userId = this.authService.getUserId();
+  return this.http.get(`${this.baseUrl}/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`);
+}
+
+
 
 }

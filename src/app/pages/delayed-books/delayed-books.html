@@ -1,1 +1,20 @@
-<p>delayed-books works!</p>
+<div class="container mt-4">
+  <h3>Delayed Books</h3>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div *ngIf="books.length === 0" class="text-muted mt-3">No overdue books found.</div>
+
+  <div *ngFor="let book of books" class="card my-2 shadow-sm border-warning">
+    <div class="card-body">
+      <h5 class="mb-1">{{ book.name }}</h5>
+      <p class="mb-0 text-danger">⚠️ This book is overdue!</p>
+      <p class="text-muted">Borrowed by: {{ book.userName || book.userId }}</p>
+    </div>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <button class="btn btn-outline-secondary" (click)="prevPage()" [disabled]="page === 1">Previous</button>
+    <button class="btn btn-outline-secondary" (click)="nextPage()">Next</button>
+  </div>
+</div>

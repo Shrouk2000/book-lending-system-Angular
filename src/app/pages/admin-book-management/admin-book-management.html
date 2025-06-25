@@ -52,6 +52,10 @@
             min="0"
           />
         </div>
+      <div class="mb-3">
+  <label>Image URL:</label>
+  <input type="text" [(ngModel)]="imageUrl" name="imageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+</div>
 
         <button class="btn btn-success" [disabled]="bookForm.invalid">
           <i class="bi bi-check-lg me-1"></i> Add Book

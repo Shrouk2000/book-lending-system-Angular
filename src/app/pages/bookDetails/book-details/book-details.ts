@@ -18,17 +18,30 @@ export class BookDetailsComponent implements OnInit {
   constructor(private route: ActivatedRoute, private bookService: BookService) {}
 
   ngOnInit(): void {
-    this.bookId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadBook();
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.bookId = +idParam;
+      this.loadBook();
+    } else {
+      this.errorMessage = 'Invalid book ID.';
+    }
   }
 
   loadBook() {
     this.bookService.getBookById(this.bookId.toString()).subscribe({
       next: (res) => {
-        this.book = res;
+        this.book = res?.data || res;
+        console.log(' Loaded book:', this.book);
+        // if (this.book) {
+        //   if (!this.book.imageUrl) {
+        //     this.book.imageUrl = 'https://via.placeholder.com/200x300?text=No+Image';
+        //   }
+        // } else {
+        //   this.errorMessage = 'Book not found.';
+        // }
       },
       error: () => {
-        this.errorMessage = 'Failed t o load book details.';
+        this.errorMessage = 'Failed to load book details.';
       }
     });
   }

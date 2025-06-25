@@ -8,7 +8,7 @@
   <div *ngFor="let book of books" class="card my-2 shadow-sm border-warning">
     <div class="card-body">
       <h5 class="mb-1">{{ book.name }}</h5>
-      <p class="mb-0 text-danger">⚠️ This book is overdue!</p>
+      <p class="mb-0 text-danger"> This book is overdue!</p>
       <p class="text-muted">Borrowed by: {{ book.userName || book.userId }}</p>
     </div>
   </div>

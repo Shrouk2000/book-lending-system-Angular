@@ -8,7 +8,7 @@ import { BookListComponent } from './pages/book-list/book-list';
 import { BookDetailsComponent } from './pages/bookDetails/book-details/book-details';
 import { DelayedBooksComponent } from './pages/delayed-books/delayed-books';
 export const routes: Routes = [
- { path: '', component: HomeComponent },  
+//  { path: '', component: HomeComponent },  
   { path: 'book-list', component: BookListComponent },
     { path: 'details/:id', component: BookDetailsComponent },
   { path: 'login', component: LoginComponent },

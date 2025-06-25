@@ -22,6 +22,9 @@ export class BookService {
     // return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}&userId=${userId}`, {});
 
   }
+uploadBookImage(bookId: number, formData: FormData) {
+  return this.http.post(`/api/books/${bookId}/upload-image`, formData);
+}
 
 returnBook(bookId: number): Observable<any> {
   const userId = this.authService.getUserId();
@@ -46,7 +49,7 @@ getMyBorrowedBooks(): Observable<any[]> {
   
   console.log(userId);
   return this.http.get<any[]>(
-     `${this.baseUrl}/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`
+     `${this.baseUrl}/BorrowBook/DisplaybooksforOneMember?userId=${userId}`
   );
 }
 getAllBorrowedBooks(): Observable<any[]> {

@@ -41,7 +41,12 @@ export class BookListComponent implements OnInit {
   loadBooks(): void {
     this.bookService.getAllBooks().subscribe({
       next: (res: any) => {
-        this.books = res.items || res ||[];
+        const books = res.items || res || [];
+      this.books = books.map((book: any) => ({
+        ...book,
+        imageUrl: book.imageUrl || 'https://picsum.photos/200/300' 
+      }));
+        
       },
       error: (err) => {
         this.errorMessage = 'Failed to load books.';
@@ -55,6 +60,7 @@ export class BookListComponent implements OnInit {
       next: (res: any) => {
         this.borrowedBooks = res?.items || res?.data||res || [];
           console.log('Borrowed books:', this.borrowedBooks); 
+          console.log(' Borrowed books from API:', res);
       },
       error: () => {
         this.borrowedBooks = [];
@@ -63,7 +69,7 @@ export class BookListComponent implements OnInit {
   }
 
   hasBorrowedThisBook(bookId: number): boolean {
-    return this.borrowedBooks.some(b => b.bookId === bookId || b.id === bookId);
+    return this.borrowedBooks.some(book => book.bookId === bookId || book.id === bookId);
   }
 
 hasAnyBorrowedBook(): boolean {
@@ -71,33 +77,26 @@ hasAnyBorrowedBook(): boolean {
 }
 
 
- borrow(id: number) {
+borrow(id: number) {
   if (this.hasAnyBorrowedBook()) {
-    alert('You must return your current borrowed book before borrowing another.');
+    alert('Return your current borrowed book first.');
     return;
   }
 
   this.bookService.borrowBook(id).subscribe({
     next: () => {
-      // this.loadBooks();
-      // this.loadBorrowedBooks(); //  updates Return button
-       const borrowed = this.books.find(b => b.id === id);
-      if (borrowed) {
-         borrowed.quantity--;
-        this.borrowedBooks = [{ ...borrowed }]; // Only one book allowed
-      }
+      this.loadBooks();
+      this.loadBorrowedBooks();
     },
-    error: () => alert('Failed to borrow book.')
+    error: () => alert('Borrow failed.')
   });
 }
 
 return(id: number) {
   this.bookService.returnBook(id).subscribe({
     next: () => {
-       this.borrowedBooks = this.borrowedBooks.filter(b => b.bookId !== id && b.id !== id);
-        this.borrowedBooks = [];
-      // this.loadBooks();
-      // this.loadBorrowedBooks(); //  updates Borrow button
+      this.loadBooks();           // restore quantity
+      this.loadBorrowedBooks();   // refresh borrowed state
     },
     error: () => alert('Failed to return book.')
   });

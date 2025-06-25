@@ -12,6 +12,7 @@ import { BookService } from '../../services/book.service';
 export class AdminBookManagementComponent {
   name = '';
   quantity = 1;
+   imageUrl = ''; 
  books: any[] = [];
   message = '';
   messageType: 'success' | 'error' = 'success';
@@ -20,6 +21,11 @@ export class AdminBookManagementComponent {
 ngOnInit():void{
   this.loadBooks();
 }
+
+selectedImage: File | null = null;
+
+
+
   addBook(form: NgForm) {
     const trimmedname = this.name.trim();
     const qty = +this.quantity;
@@ -33,6 +39,7 @@ ngOnInit():void{
       Name: trimmedname,
     
       Quantity: qty,
+       imageUrl: this.imageUrl.trim(),
       IsAvailable: true
     };
 
@@ -41,12 +48,13 @@ ngOnInit():void{
 
     this.bookService.addBook(book).subscribe({
       next: (res: any) => {
-        console.log('📥 API Response:', res);
+        console.log('API Response:', res);
         if (res?.isSuccess === true) {
+           this.imageUrl = '';
           this.showMessage(' Book added successfully!', 'success');
           form.resetForm();
         } else {
-          this.showMessage(`⚠️ ${res?.message || 'Failed to add book.'}`, 'error');
+          this.showMessage(`${res?.message || 'Failed to add book.'}`, 'error');
         }
       },
       error: (err) => {

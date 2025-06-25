@@ -1,18 +1,41 @@
-<div class="container mt-4" *ngIf="book">
-  <h2>{{ book.name }}</h2>
-  <p><strong>Quantity:</strong> {{ book.quantity }}</p>
- 
-  <span class="badge" [ngClass]="{
-    'bg-success': book.quantity > 0,
-    'bg-danger': book.quantity <= 0
-  }">
-    {{ book.quantity > 0 ? 'Available' : 'Not Available' }}
-  </span>
+<div class="container mt-5" *ngIf="book">
+  <div class="card shadow-sm border-0">
+    <div class="row g-0">
+      <!-- Image Section -->
+      <div class="col-md-4 text-center">
+        <img
+          [src]="book.imageUrl && book.imageUrl.trim() !== '' ? book.imageUrl : 'https://via.placeholder.com/200x300?text=No+Image'"
+          class="img-fluid rounded-start p-3"
+          alt="Book image"
+        />
+      </div>
 
-  <br /><br />
-  <a class="btn btn-secondary" routerLink="/book-list">Back to List</a>
+      <!-- Info Section -->
+      <div class="col-md-8">
+        <div class="card-body">
+          <h3 class="card-title">{{ book.name }}</h3>
+
+          <p class="card-text">
+            <strong>Quantity:</strong> {{ book.quantity }}
+          </p>
+
+          <span class="badge fs-6 mb-2" [ngClass]="{
+            'bg-success': book.quantity > 0,
+            'bg-danger': book.quantity <= 0
+          }">
+            {{ book.quantity > 0 ? 'Available' : 'Not Available' }}
+          </span>
+
+          <div class="mt-4">
+            <a class="btn btn-outline-primary" routerLink="/book-list">← Back to Book List</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div *ngIf="errorMessage" class="alert alert-danger mt-3">
+<!-- Error message -->
+<div *ngIf="errorMessage" class="alert alert-danger mt-4 text-center">
   {{ errorMessage }}
 </div>

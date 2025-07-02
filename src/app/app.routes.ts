@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-// import { HomeComponent } from './components/homePage/home-page/home-page';
+import { HomePage } from './components/homePage/home-page/home-page';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { MyBorrowedBooksComponent } from './my-borrowed-books/my-borrowed-books/my-borrowed-books';
@@ -11,7 +11,7 @@ import { AdminGuard } from './guards/admin-guard';
 import { AuthGuard } from './guards/auth-guard';
 import { NotFoundComponent } from './pages/not-found/not-found';
 export const routes: Routes = [
-  // { path: '', component: HomeComponent },
+  { path: '', component: HomePage },
   { path: 'book-list', component: BookListComponent },
   { path: 'details/:id', component: BookDetailsComponent },
 

@@ -22,7 +22,8 @@ interface EditableBook {
   selector: 'app-book-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './book-list.html'
+  templateUrl: './book-list.html',
+  styleUrl:'./book-list.css',
 })
 export class BookListComponent implements OnInit {
   books: EditableBook[] = [];
@@ -36,9 +37,10 @@ export class BookListComponent implements OnInit {
     publishedYear: 0, description: '', coverImageUrl: '',isAvailable: false 
   };
 
+
   currentPage = 1;
   pageSize = 10;
-
+totalCount: number = 0;
   constructor(
     private bookService: BookService,
     private auth: AuthService,
@@ -49,35 +51,41 @@ export class BookListComponent implements OnInit {
     this.isAdmin = this.auth.getRole() === 'Admin';
     this.isLoggedIn = this.auth.isLoggedIn();
 
+this.bookService.getAllBooks(2, 10).subscribe(res => {
+  this.loadBooks();
+  // console.log('Page 2 Books:', res);
+});
 
     this.loadBorrowedBooks(() => {
       this.loadBooks();
     });
   }
 
-  loadBooks(): void {
-    this.bookService.getAllBooks().subscribe({
-      next: (res: any) => {
-        const books = res.items || res || [];
-        this.books = books.map((book: any) => ({
-          id: book.id,
-          name: book.name,
-          quantity: book.quantity,
-          author: book.author,
-          isbn: book.isbn,
-          publishedYear: book.publishedYear,
-          description: book.description,
-          coverImageUrl: book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image',
-            isAvailable: book.quantity > 0 
-        }));
-        
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load books.';
-        // console.error(err);
-      }
-    });
-  }
+
+loadBooks(pageNumber: number = this.currentPage): void {
+  this.bookService.getAllBooks(pageNumber, this.pageSize).subscribe({
+    
+    next: (res: any) => {
+      const books = res.items || [];
+      this.books = books.map((book: any) => ({
+        id: book.id,
+        name: book.name,
+        quantity: book.quantity,
+        author: book.author,
+        isbn: book.isbn,
+        publishedYear: book.publishedYear,
+        description: book.description,
+        coverImageUrl: book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image',
+        isAvailable: book.quantity > 0
+      }));
+      this.totalCount = res.totalCount || 0;
+    },
+    error: (err) => {
+      this.errorMessage = 'Failed to load books.';
+    }
+  });
+}
+
 
  loadBorrowedBooks(callback?: () => void): void {
   this.bookService.getMyCurrentlyBorrowedBooks().subscribe({
@@ -213,28 +221,32 @@ return(id: number) {
     return this.books.slice(start, end);
   }
 
-  get totalPages() {
-    return Math.ceil(this.books.length / this.pageSize);
-  }
+get totalPages() {
+  return Math.ceil(this.totalCount / this.pageSize);
+}
 
   get pagesArray() {
-    return Array(this.totalPages).fill(0).map((x, i) => i + 1);
+    return Array(this.totalPages).fill(0).map((_, i) => i + 1);
   }
 previousPage() {
   if (this.currentPage > 1) {
     this.currentPage--;
+    this.loadBooks(this.currentPage); 
   }
 }
 
- nextPage() {
+nextPage() {
   if (this.currentPage < this.totalPages) {
     this.currentPage++;
-        // console.log('Next page clicked, now on page:', this.currentPage);
-         this.cdr.detectChanges();
+    this.loadBooks(this.currentPage); 
   }
 }
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) this.currentPage = page;
+goToPage(page: number) {
+  if (page >= 1 && page <= this.totalPages) {
+    this.currentPage = page;
+    this.loadBooks(this.currentPage); 
   }
+}
+
 }

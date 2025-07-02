@@ -8,6 +8,7 @@ import { BookService } from '../../services/book.service';
   selector: 'app-admin-book-management',
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-book-management.html',
+  styleUrl:'./admin-book-management.css'
 })
 export class AdminBookManagementComponent implements OnInit {
  
@@ -20,6 +21,8 @@ export class AdminBookManagementComponent implements OnInit {
     description: '',
     coverImageUrl: ''
   };
+currentPage = 1;
+pageSize = 10;
 
   books: any[] = [];
   message = '';
@@ -56,7 +59,7 @@ export class AdminBookManagementComponent implements OnInit {
   }
 
   loadBooks() {
-    this.bookService.getAllBooks().subscribe({
+  this.bookService.getAllBooks(this.currentPage, this.pageSize).subscribe({
       next: (res: any) => {
         this.books = res?.items || res || [];
       },

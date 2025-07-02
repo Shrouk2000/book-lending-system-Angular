@@ -1,14 +1,14 @@
-<div class="container my-4">
+<div class="container ">
   <h2 class="mb-4">Book List</h2>
 
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
   <div class="row">
-    <div *ngFor="let book of pagedBooks" class="col-md-4 col-sm-6 mb-4">
+    <div *ngFor="let book of books" class="col-md-4 col-sm-6 mb-4">
       <div class="card h-100 shadow-sm">
-        <img
-          [src]="book.coverImageUrl && book.coverImageUrl.trim() !== '' ? book.coverImageUrl : 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image'"
-          alt="Book Image"
+        <img 
+          [src]="book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image'" 
+          alt="Book Image" 
         />
 
         <div class="card-body d-flex flex-column">
@@ -37,7 +37,6 @@
               {{ book.quantity > 0 ? 'Borrow' : 'Not Available' }}
             </button>
 
-            
             <button 
               *ngIf="isLoggedIn && !isAdmin && hasBorrowedThisBook(book.id)"
               class="btn btn-warning btn-sm"
@@ -45,10 +44,14 @@
               <i class="bi bi-arrow-return-left me-1"></i> Return
             </button>
 
-         
+            <button 
+              class="btn btn-info btn-sm"
+              [routerLink]="['/details', book.id]">
+              Details
+            </button>
+
             <div *ngIf="!isLoggedIn" class="text-muted small">Login to borrow</div>
 
-        
             <button *ngIf="isAdmin && editModeId !== book.id"
                     class="btn btn-outline-danger btn-sm w-100"
                     (click)="deleteBook(book.id)">
@@ -63,7 +66,6 @@
 
           </div>
 
-     
           <div *ngIf="editModeId === book.id" class="mt-3">
             <form (ngSubmit)="saveEdit()" class="d-flex flex-column gap-2">
               <input [(ngModel)]="editBookData.name"
@@ -122,19 +124,18 @@
 
   <!-- Pagination -->
   <nav *ngIf="totalPages >= 1" aria-label="Page navigation" class="mt-4">
-  <ul class="pagination justify-content-center">
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
-    </li>
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+      </li>
 
-    <li class="page-item" *ngFor="let page of pagesArray" [class.active]="currentPage === page">
-      <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-    </li>
+      <li class="page-item" *ngFor="let page of pagesArray" [class.active]="currentPage === page">
+        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+      </li>
 
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
-      <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
-    </li>
-  </ul>
-</nav>
-
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </li>
+    </ul>
+  </nav>
 </div>

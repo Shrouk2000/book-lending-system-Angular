@@ -8,7 +8,8 @@ import { RouterModule } from '@angular/router';
   selector: 'app-delayed-books',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './delayed-books.html'
+  templateUrl: './delayed-books.html',
+  styleUrl:'./delayed-books.css'
 })
 export class DelayedBooksComponent implements OnInit {
   books: any[] = [];

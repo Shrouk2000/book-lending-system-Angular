@@ -12,9 +12,13 @@ export class BookService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getAllBooks(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/Book/GetBooks`);
-  }
+
+getAllBooks(pageNumber: number, pageSize: number) {
+  const url = `${this.baseUrl}/Book/GetBooks?pageNumber=${pageNumber}&pageSize=${pageSize}`;
+  return this.http.get<any>(url);
+  
+}
+
 
   borrowBook(bookId: number): Observable<any> {
     const userId = this.authService.getUserId();
@@ -36,7 +40,8 @@ export class BookService {
     return this.http.get(`${this.baseUrl}/Book/GetBook?bookId=${id}`);
   }
 
-  
+
+
  getMyCurrentlyBorrowedBooks(): Observable<any[]> {
   const userId = this.authService.getUserId();
   return this.http.get<any>(

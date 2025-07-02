@@ -4,16 +4,21 @@
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
   <div class="row">
-    <div *ngFor="let book of books" class="col-md-4 col-sm-6 mb-4">
+    <div *ngFor="let book of pagedBooks" class="col-md-4 col-sm-6 mb-4">
       <div class="card h-100 shadow-sm">
-        <div class="card-body d-flex flex-column">
-          
-          <!-- Book Image -->
-          <img *ngIf="book.imageUrl" [src]="book.imageUrl" alt="Book Image" class="img-thumbnail mb-2 mx-auto" style="max-height: 150px; width: auto;" />
+        <img
+          [src]="book.coverImageUrl && book.coverImageUrl.trim() !== '' ? book.coverImageUrl : 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image'"
+          alt="Book Image"
+        />
 
-          <!-- Book Info -->
+        <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ book.name }}</h5>
+          <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+          <p class="card-text"><strong>ISBN:</strong> {{ book.isbn }}</p>
+          <p class="card-text"><strong>Published:</strong> {{ book.publishedYear }}</p>
+          <p class="card-text">{{ book.description }}</p>
           <p class="card-text">Quantity: {{ book.quantity }}</p>
+
           <span class="badge mb-2"
                 [ngClass]="{
                   'bg-success': book.quantity > 0,
@@ -22,41 +27,43 @@
             {{ book.quantity > 0 ? 'Available' : 'Not Available' }}
           </span>
 
-          <!-- Buttons -->
           <div class="mt-auto d-flex flex-wrap gap-2">
 
-            <button *ngIf="book.quantity > 0 && !hasBorrowedThisBook(book.id)"
-                    (click)="borrow(book.id)"
-                    class="btn btn-outline-primary btn-sm w-100">
-              Borrow
+            <button 
+              *ngIf="isLoggedIn && !isAdmin && !hasBorrowedThisBook(book.id)"
+              [disabled]="book.quantity <= 0"
+              (click)="borrow(book.id)"
+              class="btn btn-primary btn-sm">
+              {{ book.quantity > 0 ? 'Borrow' : 'Not Available' }}
             </button>
 
-            <button *ngIf="hasBorrowedThisBook(book.id)"
-                    (click)="return(book.id)"
-                    class="btn btn-outline-warning btn-sm w-100">
-              Return
+            
+            <button 
+              *ngIf="isLoggedIn && !isAdmin && hasBorrowedThisBook(book.id)"
+              class="btn btn-warning btn-sm"
+              (click)="return(book.id)">
+              <i class="bi bi-arrow-return-left me-1"></i> Return
             </button>
 
-            <a [routerLink]="['/details', book.id]" class="btn btn-outline-secondary btn-sm w-100">
-              <i class="bi bi-info-circle"></i> Details
-            </a>
-
+         
             <div *ngIf="!isLoggedIn" class="text-muted small">Login to borrow</div>
 
+        
             <button *ngIf="isAdmin && editModeId !== book.id"
                     class="btn btn-outline-danger btn-sm w-100"
                     (click)="deleteBook(book.id)">
-              <i class="bi bi-trash"></i> Delete
+              Delete
             </button>
 
             <button *ngIf="isAdmin && editModeId !== book.id"
                     class="btn btn-outline-info btn-sm w-100"
                     (click)="startEdit(book)">
-              <i class="bi bi-pencil"></i> Edit
+              Edit
             </button>
+
           </div>
 
-          <!-- Edit Form -->
+     
           <div *ngIf="editModeId === book.id" class="mt-3">
             <form (ngSubmit)="saveEdit()" class="d-flex flex-column gap-2">
               <input [(ngModel)]="editBookData.name"
@@ -65,12 +72,41 @@
                      placeholder="Book Name"
                      required />
 
+              <input [(ngModel)]="editBookData.author"
+                     name="editAuthor{{book.id}}"
+                     class="form-control"
+                     placeholder="Author"
+                     required />
+
+              <input [(ngModel)]="editBookData.isbn"
+                     name="editIsbn{{book.id}}"
+                     class="form-control"
+                     placeholder="ISBN"
+                     required />
+
+              <input [(ngModel)]="editBookData.publishedYear"
+                     name="editPublished{{book.id}}"
+                     type="number"
+                     class="form-control"
+                     placeholder="Published Year"
+                     required />
+
               <input [(ngModel)]="editBookData.quantity"
                      name="editQuantity{{book.id}}"
                      type="number"
                      class="form-control"
                      placeholder="Quantity"
-                     required min="1" />
+                     required min="0" />
+
+              <textarea [(ngModel)]="editBookData.description"
+                        name="editDescription{{book.id}}"
+                        class="form-control"
+                        placeholder="Description"></textarea>
+
+              <input [(ngModel)]="editBookData.coverImageUrl"
+                     name="editCoverImage{{book.id}}"
+                     class="form-control"
+                     placeholder="Cover Image URL" />
 
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-success btn-sm w-100">Save</button>
@@ -83,4 +119,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Pagination -->
+  <nav *ngIf="totalPages >= 1" aria-label="Page navigation" class="mt-4">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+    </li>
+
+    <li class="page-item" *ngFor="let page of pagesArray" [class.active]="currentPage === page">
+      <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+    </li>
+
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+    </li>
+  </ul>
+</nav>
+
 </div>

@@ -1,0 +1,11 @@
+nav{
+   
+    background-color: #c1121f;
+}
+a{
+    font-size: 25px;
+    color: #fff;
+}
+a:hover{
+    background-color: #e2a2a6;
+}

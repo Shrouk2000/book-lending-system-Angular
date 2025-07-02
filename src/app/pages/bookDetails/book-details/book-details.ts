@@ -31,14 +31,10 @@ export class BookDetailsComponent implements OnInit {
     this.bookService.getBookById(this.bookId.toString()).subscribe({
       next: (res) => {
         this.book = res?.data || res;
-        console.log(' Loaded book:', this.book);
-        // if (this.book) {
-        //   if (!this.book.imageUrl) {
-        //     this.book.imageUrl = 'https://via.placeholder.com/200x300?text=No+Image';
-        //   }
-        // } else {
-        //   this.errorMessage = 'Book not found.';
-        // }
+        // console.log('Loaded book:', this.book);
+        if (!this.book) {
+          this.errorMessage = 'Book not found.';
+        }
       },
       error: () => {
         this.errorMessage = 'Failed to load book details.';

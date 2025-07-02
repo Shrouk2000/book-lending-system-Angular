@@ -1,4 +1,4 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { BookService } from '../../services/book.service';
@@ -9,87 +9,78 @@ import { BookService } from '../../services/book.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-book-management.html',
 })
-export class AdminBookManagementComponent {
-  name = '';
-  quantity = 1;
-   imageUrl = ''; 
- books: any[] = [];
+export class AdminBookManagementComponent implements OnInit {
+ 
+  book = {
+    name: '',
+    quantity: 0,
+    author: '',
+    isbn: '',
+    publishedYear: new Date().getFullYear(),
+    description: '',
+    coverImageUrl: ''
+  };
+
+  books: any[] = [];
   message = '';
   messageType: 'success' | 'error' = 'success';
 
   constructor(private bookService: BookService) {}
-ngOnInit():void{
-  this.loadBooks();
-}
 
-selectedImage: File | null = null;
-
-
+  ngOnInit(): void {
+    this.loadBooks();
+  }
 
   addBook(form: NgForm) {
-    const trimmedname = this.name.trim();
-    const qty = +this.quantity;
 
-    if (trimmedname.length < 3 || qty < 1) {
-      this.showMessage(' name must be at least 3 characters and quantity ≥ 1', 'error');
+    if (this.book.name.trim().length < 3) {
+      this.showMessage('Name must be at least 3 characters.', 'error');
       return;
     }
 
-    const book = {
-      Name: trimmedname,
-    
-      Quantity: qty,
-       imageUrl: this.imageUrl.trim(),
-      IsAvailable: true
-    };
-
-    console.log('Sending:', book);
-    console.log(this.name.trim())
-
-    this.bookService.addBook(book).subscribe({
+    this.bookService.addBook(this.book).subscribe({
       next: (res: any) => {
-        console.log('API Response:', res);
-        if (res?.isSuccess === true) {
-           this.imageUrl = '';
-          this.showMessage(' Book added successfully!', 'success');
-          form.resetForm();
-        } else {
-          this.showMessage(`${res?.message || 'Failed to add book.'}`, 'error');
-        }
+        // console.log('API Response:', res);
+        this.showMessage('Book added successfully!', 'success');
+        form.resetForm({
+          publishedYear: new Date().getFullYear(),
+          quantity: 0
+        });
+        this.loadBooks();
       },
       error: (err) => {
-        console.error(' Network or server error:', err);
-        this.showMessage(' Request failed. Please try again.', 'error');
+        // console.error('Add book error:', err);
+        this.showMessage('Failed to add book. Please try again.', 'error');
       }
     });
   }
-  loadBooks() {
-  this.bookService.getAllBooks().subscribe({
-    next: (res: any) => {
-      this.books = res;
-    },
-    error: () => {
-      this.showMessage(' Failed to load books', 'error');
-    }
-  });
-}
 
-deleteBook(bookId: number) {
-  if (confirm('Are you sure you want to delete this book?')) {
-    this.bookService.deleteBook(bookId).subscribe({
-      next: () => {
-        this.showMessage(' Book deleted!', 'success');
-        this.loadBooks(); 
+  loadBooks() {
+    this.bookService.getAllBooks().subscribe({
+      next: (res: any) => {
+        this.books = res?.items || res || [];
       },
-      error: () => this.showMessage(' Failed to delete book', 'error')
+      error: () => {
+        this.showMessage('Failed to load books.', 'error');
+      }
     });
   }
-}
+
+  deleteBook(bookId: number) {
+    if (confirm('Are you sure you want to delete this book?')) {
+      this.bookService.deleteBook(bookId).subscribe({
+        next: () => {
+          this.showMessage('Book deleted successfully!', 'success');
+          this.loadBooks();
+        },
+        error: () => this.showMessage('Failed to delete book.', 'error')
+      });
+    }
+  }
 
   showMessage(msg: string, type: 'success' | 'error' = 'success') {
     this.message = msg;
     this.messageType = type;
     setTimeout(() => (this.message = ''), 4000);
   }
-  
 }

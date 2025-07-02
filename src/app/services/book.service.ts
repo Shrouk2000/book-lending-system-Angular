@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -15,48 +16,45 @@ export class BookService {
     return this.http.get(`${this.baseUrl}/Book/GetBooks`);
   }
 
- borrowBook(bookId: number): Observable<any> {
-    const userId = this.authService.getUserId(); // get ID from JWT
+  borrowBook(bookId: number): Observable<any> {
+    const userId = this.authService.getUserId();
     const body = { userId, bookId };
     return this.http.post(`${this.baseUrl}/BorrowBook/Borrow`, body);
-    // return this.http.post(`${this.baseUrl}/BorrowBook/Borrow?bookId=${bookId}&userId=${userId}`, {});
-
   }
-uploadBookImage(bookId: number, formData: FormData) {
-  return this.http.post(`/api/books/${bookId}/upload-image`, formData);
-}
 
-returnBook(bookId: number): Observable<any> {
+ returnBook(bookId: number): Observable<any> {
   const userId = this.authService.getUserId();
   console.log('Returning bookId:', bookId, 'for userId:', userId);
-
   return this.http.put(
-    
     `${this.baseUrl}/BorrowBook/ReturnBook?BookId=${bookId}&userId=${userId}`,
-    {},{ responseType: 'text' }
-    
+    {},
+    { responseType: 'text' }
   );
 }
-
-
 
   getBookById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/Book/GetBook?bookId=${id}`);
   }
 
-getMyBorrowedBooks(): Observable<any[]> {
-  const userId = this.authService.getUserId();
   
-  console.log(userId);
-  return this.http.get<any[]>(
-     `${this.baseUrl}/BorrowBook/DisplaybooksforOneMember?userId=${userId}`
+ getMyCurrentlyBorrowedBooks(): Observable<any[]> {
+  const userId = this.authService.getUserId();
+  return this.http.get<any>(
+    `${this.baseUrl}/BorrowBook/DisplaybooksforOneMember?userId=${userId}`
+  ).pipe(
+    map(res => res?.items || res || [])
   );
 }
-getAllBorrowedBooks(): Observable<any[]> {
-  return this.http.get<any[]>(
-    `${this.baseUrl}/BorrowBook/GetAllNotReturnedBooks`
-  );
-}
+
+
+  getAllBorrowedBooks(): Observable<any[]> {
+    const userId = this.authService.getUserId();
+
+    return this.http.get<any[]>(`${this.baseUrl}/BorrowBook/DisplaybooksforOneMember?userId=${userId}`);
+    // console.log(userId)
+    
+  }
+
   addBook(book: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/Book`, book);
   }
@@ -65,28 +63,20 @@ getAllBorrowedBooks(): Observable<any[]> {
     return this.http.delete(`${this.baseUrl}/Book?bookId=${bookId}`);
   }
 
-updateBook(book: any): Observable<any> {
-  return this.http.put(
-    `https://booklending-api-raghda-test.jahezteam.com/api/Book?bookId=${book.bookId}`, 
-    {
+  updateBook(book: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/Book?bookId=${book.bookId}`, {
       name: book.name,
       quantity: book.quantity,
       isDeleted: false
-    }
-  );
-}
+    });
+  }
 
-// For admin: all overdue books
-getAllOverdueBooks(page = 1, pageSize = 10): Observable<any> {
-  return this.http.get(`${this.baseUrl}/BorrowBook/DisplaybooksOverDue?pageNumber=${page}&pageSize=${pageSize}`);
-}
+  getAllOverdueBooks(page = 1, pageSize = 10): Observable<any> {
+    return this.http.get(`${this.baseUrl}/BorrowBook/DisplaybooksOverDue?pageNumber=${page}&pageSize=${pageSize}`);
+  }
 
-// For members: their own overdue books
-getMyOverdueBooks(): Observable<any> {
-  const userId = this.authService.getUserId();
-  return this.http.get(`${this.baseUrl}/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`);
-}
-
-
-
+  getMyOverdueBooks(): Observable<any> {
+    const userId = this.authService.getUserId();
+    return this.http.get(`${this.baseUrl}/BorrowBook/DisplayNotReturnbooksforOneMember?userId=${userId}`);
+  }
 }

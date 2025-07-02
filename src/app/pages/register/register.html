@@ -1,4 +1,4 @@
-<div class="container mt-5" style="max-width: 500px;">
+<div class="container" style="max-width: 500px; margin-top: 150px;">
   <h2 class="mb-4">Register</h2>
 
   <form #f="ngForm" (ngSubmit)="register(f)" novalidate>
@@ -65,28 +65,30 @@
       </div>
     </div>
 
-    <!-- Phone Number -->
-    <div class="mb-3">
-      <label for="phoneNumber" class="form-label">Phone Number</label>
-      <input
-        type="text"
-        id="phoneNumber"
-        name="phoneNumber"
-        [(ngModel)]="phoneNumber"
-        required
-        pattern="^[0-9]{10,}$"
-        class="form-control"
-        [class.is-invalid]="f.submitted && f.controls['phoneNumber']?.invalid"
-      />
-      <div class="invalid-feedback" *ngIf="f.controls['phoneNumber']?.errors?.['required']">
-        Phone number is required.
-      </div>
-      <div class="invalid-feedback" *ngIf="f.controls['phoneNumber']?.errors?.['pattern']">
-        Enter a valid phone number (at least 10 digits).
-      </div>
-    </div>
+  
+   <!-- Phone Number -->
+<div class="mb-3">
+  <label for="phoneNumber" class="form-label">Phone Number</label>
+  <input
+    type="text"
+    id="phoneNumber"
+    name="phoneNumber"
+    [(ngModel)]="phoneNumber"
+    required
+    pattern="^\+20[0-9]{10}$"
+    class="form-control"
+    [class.is-invalid]="f.submitted && f.controls['phoneNumber']?.invalid"
+  />
+  <div class="invalid-feedback" *ngIf="f.controls['phoneNumber']?.errors?.['required']">
+    Phone number is required.
+  </div>
+  <div class="invalid-feedback" *ngIf="f.controls['phoneNumber']?.errors?.['pattern']">
+    Enter a valid Egyptian phone number starting with +20 and followed by 10 digits.
+  </div>
+</div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
+
+    <button type="submit" class="btn btn-danger w-100">Register</button>
   </form>
 <div class="mt-3 text-center">
   <p class="small">

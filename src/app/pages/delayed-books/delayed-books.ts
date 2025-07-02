@@ -15,6 +15,8 @@ export class DelayedBooksComponent implements OnInit {
   isAdmin = false;
   page = 1;
   pageSize = 10;
+  totalCount = 0;
+  totalPages = 1;
   errorMessage = '';
 
   constructor(private bookService: BookService, private auth: AuthService) {}
@@ -28,7 +30,10 @@ export class DelayedBooksComponent implements OnInit {
     if (this.isAdmin) {
       this.bookService.getAllOverdueBooks(this.page, this.pageSize).subscribe({
         next: (res) => {
-          this.books = res.items || res.data || res || [];
+          // console.log('Admin overdue books res:', res);
+          this.books = res.items || [];
+          this.totalCount = res.totalCount || 0;
+          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
         },
         error: () => {
           this.errorMessage = 'Failed to load overdue books.';
@@ -37,7 +42,10 @@ export class DelayedBooksComponent implements OnInit {
     } else {
       this.bookService.getMyOverdueBooks().subscribe({
         next: (res) => {
+          // console.log('User overdue books res:', res);
           this.books = res.items || res.data || res || [];
+          this.totalCount = this.books.length;
+          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
         },
         error: () => {
           this.errorMessage = 'Failed to load your overdue books.';
@@ -47,8 +55,10 @@ export class DelayedBooksComponent implements OnInit {
   }
 
   nextPage() {
-    this.page++;
-    this.loadBooks();
+    if (this.page < this.totalPages) {
+      this.page++;
+      this.loadBooks();
+    }
   }
 
   prevPage() {

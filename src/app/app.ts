@@ -8,4 +8,6 @@ import { NavbarComponent } from './components/navbar';
   imports: [RouterOutlet,NavbarComponent],
   templateUrl: './app.html'
 })
-export class App {}
+export class App {
+  
+}

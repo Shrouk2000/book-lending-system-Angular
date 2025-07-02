@@ -1,5 +1,4 @@
 <div class="container my-4">
-  <!-- Header -->
   <div class="bg-dark text-white p-4 rounded shadow-sm d-flex justify-content-between align-items-center">
     <h2 class="mb-0">
       <i class="bi bi-journal-bookmark-fill me-2"></i> Admin Book Management
@@ -9,59 +8,62 @@
     </span>
   </div>
 
-  <!-- Alert Message -->
-  <div
-    *ngIf="message"
-    class="alert mt-3"
-    [ngClass]="{
-      'alert-success': messageType === 'success',
-      'alert-danger': messageType === 'error'
-    }"
-    [innerHTML]="message"
-  ></div>
+  <div *ngIf="message" class="alert mt-3"
+    [ngClass]="{ 'alert-success': messageType === 'success', 'alert-danger': messageType === 'error' }">
+    {{ message }}
+  </div>
 
-  <!-- Add Book Form -->
+
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
       <h5 class="card-title"><i class="bi bi-plus-circle me-2"></i> Add New Book</h5>
       <form #bookForm="ngForm" (ngSubmit)="addBook(bookForm)">
-        <div class="mb-3">
-          <input
-            [(ngModel)]="name"
-            name="name"
-            class="form-control"
-            placeholder="name (min 3 letters)"
-            required
-            minlength="3"
-            #nameInput="ngModel"
-          />
-          <div *ngIf="nameInput.invalid && nameInput.touched" class="text-danger">
-            name must be at least 3 characters.
-          </div>
-        </div>
-
 
         <div class="mb-3">
-          <input
-            [(ngModel)]="quantity"
-            name="quantity"
-            type="number"
-            class="form-control"
-            placeholder="Quantity"
-            required
-            min="0"
-          />
+          <input [(ngModel)]="book.name" name="name" class="form-control" placeholder="Book Name" required minlength="3">
         </div>
-      <div class="mb-3">
-  <label>Image URL:</label>
-  <input type="text" [(ngModel)]="imageUrl" name="imageUrl" class="form-control" placeholder="https://example.com/image.jpg">
-</div>
 
-        <button class="btn btn-success" [disabled]="bookForm.invalid">
+        <div class="mb-3">
+          <input [(ngModel)]="book.author" name="author" class="form-control" placeholder="Author" required>
+        </div>
+
+        <div class="mb-3">
+          <input [(ngModel)]="book.isbn" name="isbn" class="form-control" placeholder="ISBN" required>
+        </div>
+
+        <div class="mb-3">
+          <input [(ngModel)]="book.publishedYear" name="publishedYear" type="number" class="form-control" placeholder="Published Year" required min="1000" max="9999">
+        </div>
+
+        <div class="mb-3">
+          <textarea [(ngModel)]="book.description" name="description" class="form-control" placeholder="Description" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <input [(ngModel)]="book.coverImageUrl" name="coverImageUrl" class="form-control" placeholder="Cover Image URL" required>
+        </div>
+
+        <div class="mb-3">
+          <input [(ngModel)]="book.quantity" name="quantity" type="number" class="form-control" placeholder="Quantity" required min="0">
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="bookForm.invalid">
           <i class="bi bi-check-lg me-1"></i> Add Book
         </button>
-        
+
       </form>
     </div>
+  </div>
+
+  <div class="mt-5">
+    <h5>All Books</h5>
+    <ul class="list-group">
+      <li *ngFor="let b of books" class="list-group-item d-flex justify-content-between align-items-center">
+        {{ b.name }} by {{ b.author }}
+        <button (click)="deleteBook(b.id)" class="btn btn-danger btn-sm">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </li>
+    </ul>
   </div>
 </div>

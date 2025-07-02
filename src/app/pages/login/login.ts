@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,RouterModule],
   templateUrl: './login.html'
 })
 export class LoginComponent {
@@ -42,7 +43,7 @@ export class LoginComponent {
         this.loading = false;
       },
       error: (err) => {
-        console.error('Login error:', err);
+        // console.error('Login error:', err);
         this.errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
         this.loading = false;
       }

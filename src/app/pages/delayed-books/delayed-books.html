@@ -7,14 +7,15 @@
 
   <div *ngFor="let book of books" class="card my-2 shadow-sm border-warning">
     <div class="card-body">
-      <h5 class="mb-1">{{ book.name }}</h5>
-      <p class="mb-0 text-danger"> This book is overdue!</p>
+      <h5 class="mb-1">{{ book.bookName || book.name }}</h5>
+      <p class="mb-0 text-danger">This book is overdue!</p>
       <p class="text-muted">Borrowed by: {{ book.userName || book.userId }}</p>
     </div>
   </div>
 
-  <div class="mt-3 d-flex gap-2">
+  <div class="mt-3 d-flex justify-content-between align-items-center">
     <button class="btn btn-outline-secondary" (click)="prevPage()" [disabled]="page === 1">Previous</button>
-    <button class="btn btn-outline-secondary" (click)="nextPage()">Next</button>
+    <span>Page {{ page }} of {{ totalPages }}</span>
+    <button class="btn btn-outline-secondary" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
   </div>
 </div>

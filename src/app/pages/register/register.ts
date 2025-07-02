@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: '/register.html',
+  templateUrl: './register.html'
 })
 export class RegisterComponent {
   username = '';
@@ -38,10 +38,10 @@ export class RegisterComponent {
         this.successMessage = 'Registration successful! Redirecting to login...';
         setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 1500); // redirects after 1.5 seconds
+        }, 1500); 
       },
       error: (err) => {
-        console.error('Registration error:', err);
+        // console.error('Registration error:', err);
         this.errorMessage = err.error || 'Registration failed.';
       },
     });

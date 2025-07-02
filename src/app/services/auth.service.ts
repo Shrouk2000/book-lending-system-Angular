@@ -62,7 +62,5 @@ getUserId(): string {
 }
 
 
-// get isMember(): boolean {
-//   return this.auth.getRole() === 'Member';
-// }
+
 }

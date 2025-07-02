@@ -1,5 +1,5 @@
-<div class="container mt-5" style="max-width: 500px;">
-  <h2 class="mb-4">Login</h2>
+<div class="container " style="max-width: 500px; margin-top: 150px;" >
+  <h2 class="mb-5">Login</h2>
 
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
@@ -32,14 +32,15 @@
       <div class="invalid-feedback">Password is required.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+    <button type="submit" class="btn btn-danger w-100" [disabled]="loading">
       {{ loading ? 'Logging in...' : 'Login' }}
     </button>
   </form>
 
  <div class="mt-3 text-center">
   <p class="small">
-    Don't have an account?
-    <a routerLink="/register" class="text-decoration-none">Register</a>
-  </p>
+  Don't have an account?
+  <a [routerLink]="['/register']" class="text-decoration-none">Register</a>
+
+</p>
 </div>

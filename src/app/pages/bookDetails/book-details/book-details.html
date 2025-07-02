@@ -1,19 +1,37 @@
 <div class="container mt-5" *ngIf="book">
   <div class="card shadow-sm border-0">
     <div class="row g-0">
-      <!-- Image Section -->
+     
       <div class="col-md-4 text-center">
-        <img
-          [src]="book.imageUrl && book.imageUrl.trim() !== '' ? book.imageUrl : 'https://via.placeholder.com/200x300?text=No+Image'"
-          class="img-fluid rounded-start p-3"
-          alt="Book image"
-        />
+<img
+  [src]="book.coverImageUrl && book.coverImageUrl.trim() !== '' ? book.coverImageUrl : 'https://dummyimage.com/200x300/cccccc/000000&text=No+Image'"
+  class="img-fluid rounded-start p-3"
+  alt="Book image"
+/>
+
       </div>
 
-      <!-- Info Section -->
+      
       <div class="col-md-8">
         <div class="card-body">
           <h3 class="card-title">{{ book.name }}</h3>
+
+          <p class="card-text">
+            <strong>Author:</strong> {{ book.author }}
+          </p>
+
+          <p class="card-text">
+            <strong>ISBN:</strong> {{ book.isbn }}
+          </p>
+
+          <p class="card-text">
+            <strong>Published Year:</strong> {{ book.publishedYear }}
+          </p>
+
+          <p class="card-text">
+            <strong>Description:</strong><br>
+            {{ book.description }}
+          </p>
 
           <p class="card-text">
             <strong>Quantity:</strong> {{ book.quantity }}
@@ -35,7 +53,7 @@
   </div>
 </div>
 
-<!-- Error message -->
+
 <div *ngIf="errorMessage" class="alert alert-danger mt-4 text-center">
   {{ errorMessage }}
 </div>

@@ -11,12 +11,15 @@ export class AuthService {
   private apiUrl = 'https://booklending-api-raghda-test.jahezteam.com/api/Account';
 
 
-  login(credentials: { email: string; password: string }) {
-    return this.http.post(`${this.apiUrl}/login`, {
-      email: credentials.email.trim(),
-      password: credentials.password.trim()
-    });
-  }
+login(credentials: { email: string; password: string }) {
+  return this.http.post(`${this.apiUrl}/login`, {
+    email: credentials.email.trim(),
+    password: credentials.password.trim()
+  }, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
 
  
   register(userData: any) {
@@ -62,5 +65,8 @@ getUserId(): string {
 }
 
 
+isAdmin(): boolean {
+  return this.getRole() === 'Admin';
+}
 
 }

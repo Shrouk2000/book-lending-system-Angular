@@ -1,21 +1,20 @@
-<div class="container " style="max-width: 500px; margin-top: 150px;" >
+<div class="container" style="max-width: 500px; margin-top: 150px;">
   <h2 class="mb-5">Login</h2>
 
-  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-  <form (ngSubmit)="login()" #f="ngForm" novalidate>
+  <form [formGroup]="loginForm" (ngSubmit)="login()">
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
       <input
         type="email"
         id="email"
         class="form-control"
-        [(ngModel)]="email"
-        name="email"
-        required
-        [class.is-invalid]="f.submitted && !email"
+        formControlName="email"
+        [class.is-invalid]="email?.invalid && (email?.touched || email?.dirty)"
       />
-      <div class="invalid-feedback">Email is required.</div>
+      <div *ngIf="email?.invalid && (email?.touched || email?.dirty)" class="invalid-feedback">
+        <div *ngIf="email?.errors?.['required']">Email is required.</div>
+        <div *ngIf="email?.errors?.['email']">Please enter a valid email.</div>
+      </div>
     </div>
 
     <div class="mb-3">
@@ -24,23 +23,28 @@
         type="password"
         id="password"
         class="form-control"
-        [(ngModel)]="password"
-        name="password"
-        required
-        [class.is-invalid]="f.submitted && !password"
+        formControlName="password"
+        [class.is-invalid]="password?.invalid && (password?.touched || password?.dirty)"
       />
-      <div class="invalid-feedback">Password is required.</div>
+      <div *ngIf="password?.invalid && (password?.touched || password?.dirty)" class="invalid-feedback">
+        <div *ngIf="password?.errors?.['required']">Password is required.</div>
+        <div *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</div>
+      </div>
     </div>
 
     <button type="submit" class="btn btn-danger w-100" [disabled]="loading">
       {{ loading ? 'Logging in...' : 'Login' }}
     </button>
+
+    <div *ngIf="generalError" class="alert alert-danger mt-3">
+      {{ generalError }}
+    </div>
   </form>
 
- <div class="mt-3 text-center">
-  <p class="small">
-  Don't have an account?
-  <a [routerLink]="['/register']" class="text-decoration-none">Register</a>
-
-</p>
+  <div class="mt-3 text-center">
+    <p class="small">
+      Don't have an account?
+      <a [routerLink]="['/register']" class="text-decoration-none">Register</a>
+    </p>
+  </div>
 </div>

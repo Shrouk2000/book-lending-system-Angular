@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
@@ -8,31 +8,34 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html'
 })
-export class LoginComponent {
-  email = '';
-  password = '';
-  errorMessage = '';
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
   loading = false;
+  generalError = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   login() {
-    this.errorMessage = '';
-    this.loading = true;
+    this.generalError = '';
 
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Email and password are required.';
-      this.loading = false;
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
-    const credentials = {
-      email: this.email.trim(),
-      password: this.password
-    };
+    this.loading = true;
+
+    const credentials = this.loginForm.value;
 
     this.auth.login(credentials).subscribe({
       next: (res: any) => {
@@ -43,10 +46,17 @@ export class LoginComponent {
         this.loading = false;
       },
       error: (err) => {
-        // console.error('Login error:', err);
-        this.errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
+        this.generalError = err.error?.message || 'Invalid email or password. Please try again.';
         this.loading = false;
       }
     });
+  }
+
+  get email() {
+    return this.loginForm.get('email');
+  }
+
+  get password() {
+    return this.loginForm.get('password');
   }
 }

@@ -8,10 +8,9 @@ import { BookService } from '../../services/book.service';
   selector: 'app-admin-book-management',
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-book-management.html',
-  styleUrl:'./admin-book-management.css'
+  styleUrl: './admin-book-management.css'
 })
 export class AdminBookManagementComponent implements OnInit {
- 
   book = {
     name: '',
     quantity: 0,
@@ -21,9 +20,9 @@ export class AdminBookManagementComponent implements OnInit {
     description: '',
     coverImageUrl: ''
   };
-currentPage = 1;
-pageSize = 10;
 
+  currentPage = 1;
+  pageSize = 10;
   books: any[] = [];
   message = '';
   messageType: 'success' | 'error' = 'success';
@@ -35,15 +34,13 @@ pageSize = 10;
   }
 
   addBook(form: NgForm) {
-
-    if (this.book.name.trim().length < 3) {
-      this.showMessage('Name must be at least 3 characters.', 'error');
+    if (form.invalid) {
+      this.showMessage('Please fix form errors before submitting.', 'error');
       return;
     }
 
     this.bookService.addBook(this.book).subscribe({
-      next: (res: any) => {
-        // console.log('API Response:', res);
+      next: () => {
         this.showMessage('Book added successfully!', 'success');
         form.resetForm({
           publishedYear: new Date().getFullYear(),
@@ -51,15 +48,14 @@ pageSize = 10;
         });
         this.loadBooks();
       },
-      error: (err) => {
-        // console.error('Add book error:', err);
+      error: () => {
         this.showMessage('Failed to add book. Please try again.', 'error');
       }
     });
   }
 
   loadBooks() {
-  this.bookService.getAllBooks(this.currentPage, this.pageSize).subscribe({
+    this.bookService.getAllBooks(this.currentPage, this.pageSize).subscribe({
       next: (res: any) => {
         this.books = res?.items || res || [];
       },
@@ -76,7 +72,9 @@ pageSize = 10;
           this.showMessage('Book deleted successfully!', 'success');
           this.loadBooks();
         },
-        error: () => this.showMessage('Failed to delete book.', 'error')
+        error: () => {
+          this.showMessage('Failed to delete book.', 'error');
+        }
       });
     }
   }

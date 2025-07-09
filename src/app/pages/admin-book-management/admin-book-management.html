@@ -1,60 +1,89 @@
-<div class="container ">
-  <div class="bg-danger text-white  p-4 rounded shadow-sm d-flex justify-content-between align-items-center">
-    <h2 class="mb-0 ">
+<div class="container">
+  <div class="bg-danger text-white p-4 rounded shadow-sm d-flex justify-content-between align-items-center">
+    <h2 class="mb-0">
       <i class="bi bi-journal-bookmark-fill me-2"></i> Admin Book Management
     </h2>
-    <span class="badge bg-primary ">
+    <span class="badge bg-primary">
       <i class="bi bi-person-gear me-1"></i> Admin Panel
     </span>
   </div>
 
-  <div *ngIf="message" class="alert mt-3"
-    [ngClass]="{ 'alert-success': messageType === 'success', 'alert-danger': messageType === 'error' }">
+  
+  <div *ngIf="message" class="alert mt-3" [ngClass]="{ 'alert-success': messageType === 'success', 'alert-danger': messageType === 'error' }">
     {{ message }}
   </div>
-
 
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
       <h5 class="card-title"><i class="bi bi-plus-circle me-2"></i> Add New Book</h5>
-      <form #bookForm="ngForm" (ngSubmit)="addBook(bookForm)">
-
+      <form #bookForm="ngForm" (ngSubmit)="addBook(bookForm)" novalidate>
         <div class="mb-3">
-          <input [(ngModel)]="book.name" name="name" class="form-control" placeholder="Book Name" required minlength="3">
+          <label for="name" class="form-label">Book Name</label>
+          <input [(ngModel)]="book.name" name="name" id="name" class="form-control" required minlength="3" #name="ngModel">
+          <div class="text-danger small" *ngIf="name.invalid && (name.dirty || name.touched)">
+            <div *ngIf="name.errors?.['required']">Book name is required.</div>
+            <div *ngIf="name.errors?.['minlength']">Book name must be at least 3 characters.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <input [(ngModel)]="book.author" name="author" class="form-control" placeholder="Author" required>
+          <label for="author" class="form-label">Author</label>
+          <input [(ngModel)]="book.author" name="author" id="author" class="form-control" required #author="ngModel">
+          <div class="text-danger small" *ngIf="author.invalid && (author.dirty || author.touched)">
+            <div *ngIf="author.errors?.['required']">Author is required.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <input [(ngModel)]="book.isbn" name="isbn" class="form-control" placeholder="ISBN" required>
+          <label for="isbn" class="form-label">ISBN</label>
+          <input [(ngModel)]="book.isbn" name="isbn" id="isbn" class="form-control" required #isbn="ngModel">
+          <div class="text-danger small" *ngIf="isbn.invalid && (isbn.dirty || isbn.touched)">
+            <div *ngIf="isbn.errors?.['required']">ISBN is required.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <input [(ngModel)]="book.publishedYear" name="publishedYear" type="number" class="form-control" placeholder="Published Year" required min="1000" max="9999">
+          <label for="publishedYear" class="form-label">Published Year</label>
+          <input [(ngModel)]="book.publishedYear" name="publishedYear" id="publishedYear" type="number" class="form-control" required min="1000" max="9999" #publishedYear="ngModel">
+          <div class="text-danger small" *ngIf="publishedYear.invalid && (publishedYear.dirty || publishedYear.touched)">
+            <div *ngIf="publishedYear.errors?.['required']">Published year is required.</div>
+            <div *ngIf="publishedYear.errors?.['min'] || publishedYear.errors?.['max']">Enter a valid year between 1000 and 9999.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <textarea [(ngModel)]="book.description" name="description" class="form-control" placeholder="Description" rows="3" required></textarea>
+          <label for="description" class="form-label">Description</label>
+          <textarea [(ngModel)]="book.description" name="description" id="description" class="form-control" required rows="3" #description="ngModel"></textarea>
+          <div class="text-danger small" *ngIf="description.invalid && (description.dirty || description.touched)">
+            <div *ngIf="description.errors?.['required']">Description is required.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <input [(ngModel)]="book.coverImageUrl" name="coverImageUrl" class="form-control" placeholder="Cover Image URL" required>
+          <label for="coverImageUrl" class="form-label">Cover Image URL</label>
+          <input [(ngModel)]="book.coverImageUrl" name="coverImageUrl" id="coverImageUrl" class="form-control" required #coverImageUrl="ngModel">
+          <div class="text-danger small" *ngIf="coverImageUrl.invalid && (coverImageUrl.dirty || coverImageUrl.touched)">
+            <div *ngIf="coverImageUrl.errors?.['required']">Cover image URL is required.</div>
+          </div>
         </div>
 
         <div class="mb-3">
-          <input [(ngModel)]="book.quantity" name="quantity" type="number" class="form-control" placeholder="Quantity" required min="0">
+          <label for="quantity" class="form-label">Quantity</label>
+          <input [(ngModel)]="book.quantity" name="quantity" id="quantity" type="number" class="form-control" required min="1" #quantity="ngModel">
+          <div class="text-danger small" *ngIf="quantity.invalid && (quantity.dirty || quantity.touched)">
+            <div *ngIf="quantity.errors?.['required']">Quantity is required.</div>
+            <div *ngIf="quantity.errors?.['min']">Quantity cannot be negative.</div>
+          </div>
         </div>
 
         <button type="submit" class="btn btn-success" [disabled]="bookForm.invalid">
           <i class="bi bi-check-lg me-1"></i> Add Book
         </button>
-
       </form>
     </div>
   </div>
 
+  <!-- Books List -->
   <div class="mt-5">
     <h5>All Books</h5>
     <ul class="list-group">

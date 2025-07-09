@@ -26,51 +26,55 @@ export class MyBorrowedBooksComponent implements OnInit {
     }
   }
 
-loadCurrentlyBorrowedBooks() {
-  this.bookService.getMyCurrentlyBorrowedBooks().subscribe({
-    next: (res: any) => {
-      // console.log('Currently borrowed books API response:', res);
-      
-      this.books = (res?.items || res?.data || res || []).filter((book: any) =>
-        book.statusBook !== 'Returned'
-      );
-    },
-    error: (err) => {
-      // console.error('Failed to load currently borrowed books:', err);
-      this.errorMessage = 'Failed to load borrowed books.';
-    }
-  });
-}
-
-
- 
-  loadAllBorrowedBooks() {
-    this.bookService.getAllBorrowedBooks().subscribe({
+  loadCurrentlyBorrowedBooks() {
+    this.bookService.getMyCurrentlyBorrowedBooks().subscribe({
       next: (res: any) => {
-        // console.log('All borrowed books API response:', res);
-        this.books = res?.items || res?.data || res || [];
+        this.books = (res?.items || res?.data || res || []).filter((book: any) =>
+          book.statusBook !== 'Returned'
+        );
       },
-      error: (err) => {
-        // console.error('Failed to load all borrowed books:', err);
-        this.errorMessage = 'Failed to load all borrowed books.';
+      error: () => {
+        this.showMessage('error', 'Failed to load borrowed books.');
       }
     });
   }
 
-  
+  loadAllBorrowedBooks() {
+    this.bookService.getAllBorrowedBooks().subscribe({
+      next: (res: any) => {
+        this.books = res?.items || res?.data || res || [];
+      },
+      error: () => {
+        this.showMessage('error', 'Failed to load all borrowed books.');
+      }
+    });
+  }
+
   returnBook(bookId: number) {
     this.bookService.returnBook(bookId).subscribe({
       next: () => {
-        this.successMessage = 'Book returned successfully.';
-     
         this.books = this.books.filter(book => book.bookId !== bookId && book.id !== bookId);
-        setTimeout(() => (this.successMessage = ''), 3000);
+        this.showMessage('success', 'Book returned successfully.');
       },
-      error: (err) => {
-        // console.error('Failed to return book:', err);
-        this.errorMessage = 'Failed to return book.';
-        setTimeout(() => (this.errorMessage = ''), 3000);
+      error: () => {
+        this.showMessage('error', 'Failed to return book.');
       }
     });
+  }
+
+  private showMessage(type: 'success' | 'error', message: string) {
+    if (type === 'success') {
+      this.successMessage = message;
+    } else {
+      this.errorMessage = message;
+    }
+
+    setTimeout(() => {
+      if (type === 'success') {
+        this.successMessage = '';
+      } else {
+        this.errorMessage = '';
+      }
+    }, 3000);
   }
 }

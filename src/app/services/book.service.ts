@@ -68,13 +68,20 @@ getAllBooks(pageNumber: number, pageSize: number) {
     return this.http.delete(`${this.baseUrl}/Book?bookId=${bookId}`);
   }
 
-  updateBook(book: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/Book?bookId=${book.bookId}`, {
-      name: book.name,
-      quantity: book.quantity,
-      isDeleted: false
-    });
-  }
+updateBook(book: any): Observable<any> {
+  return this.http.put(`${this.baseUrl}/Book?bookId=${book.bookId}`, {
+    name: book.name,
+    quantity: book.quantity,
+    isDeleted: false, 
+    author: book.author,
+    isbn: book.isbn,
+    publishedYear: book.publishedYear,
+    description: book.description,
+    coverImageUrl: book.coverImageUrl
+  });
+}
+
+
 
   getAllOverdueBooks(page = 1, pageSize = 10): Observable<any> {
     return this.http.get(`${this.baseUrl}/BorrowBook/DisplaybooksOverDue?pageNumber=${page}&pageSize=${pageSize}`);

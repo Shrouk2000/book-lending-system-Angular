@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { BookService } from '../../services/book.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { ChangeDetectorRef } from '@angular/core';
+import * as bootstrap from 'bootstrap';
 
 interface EditableBook {
   id: number;
@@ -16,6 +16,7 @@ interface EditableBook {
   description: string;
   coverImageUrl: string;
   isAvailable: boolean;
+  message?: string;
 }
 
 @Component({
@@ -23,166 +24,194 @@ interface EditableBook {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './book-list.html',
-  styleUrl:'./book-list.css',
+  styleUrl: './book-list.css',
 })
-export class BookListComponent implements OnInit {
+export class BookListComponent implements OnInit, AfterViewInit {
+  @ViewChild('editBookModal') editBookModal!: ElementRef;
+  modalInstance: any;
+
+  @ViewChild('deleteConfirmModal') deleteConfirmModal!: ElementRef;
+  deleteModalInstance: any;
+  selectedBookToDelete: EditableBook | null = null;
+
   books: EditableBook[] = [];
   borrowedBooks: any[] = [];
   isAdmin = false;
   isLoggedIn = false;
   errorMessage = '';
-  editModeId: number | null = null;
+  successMessage = '';
+
   editBookData: EditableBook = {
     id: 0, name: '', quantity: 0, author: '', isbn: '',
-    publishedYear: 0, description: '', coverImageUrl: '',isAvailable: false 
+    publishedYear: 0, description: '', coverImageUrl: '', isAvailable: false
   };
-
 
   currentPage = 1;
   pageSize = 10;
-totalCount: number = 0;
+  totalCount: number = 0;
+
   constructor(
     private bookService: BookService,
     private auth: AuthService,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.isAdmin = this.auth.getRole() === 'Admin';
     this.isLoggedIn = this.auth.isLoggedIn();
+    this.loadBorrowedBooks(() => this.loadBooks());
+  }
 
-this.bookService.getAllBooks(2, 10).subscribe(res => {
-  this.loadBooks();
-  // console.log('Page 2 Books:', res);
-});
+  ngAfterViewInit(): void {
+    if (this.editBookModal) {
+      this.modalInstance = new bootstrap.Modal(this.editBookModal.nativeElement);
+    }
+    if (this.deleteConfirmModal) {
+      this.deleteModalInstance = new bootstrap.Modal(this.deleteConfirmModal.nativeElement);
+    }
+  }
 
-    this.loadBorrowedBooks(() => {
-      this.loadBooks();
+  loadBooks(pageNumber: number = this.currentPage): void {
+    this.bookService.getAllBooks(pageNumber, this.pageSize).subscribe({
+      next: (res: any) => {
+        const books = res.items || [];
+        this.books = books.map((book: any) => ({
+          id: book.id,
+          name: book.name,
+          quantity: book.quantity,
+          author: book.author,
+          isbn: book.isbn,
+          publishedYear: book.publishedYear,
+          description: book.description,
+          coverImageUrl: book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image',
+          isAvailable: book.quantity > 0,
+          message: ''
+        }));
+        this.totalCount = res.totalCount || 0;
+      },
+      error: () => this.showMessage('error', 'Failed to load books.')
     });
   }
 
+  loadBorrowedBooks(callback?: () => void): void {
+    this.bookService.getMyCurrentlyBorrowedBooks().subscribe({
+      next: (res: any) => {
+        const allBooks = res?.items || res?.data || res || [];
+        const filteredBooks = allBooks.filter((book: any) =>
+          book.statusBook !== 'Returned' && book.statusBook !== 'returned'
+        );
 
-loadBooks(pageNumber: number = this.currentPage): void {
-  this.bookService.getAllBooks(pageNumber, this.pageSize).subscribe({
-    
-    next: (res: any) => {
-      const books = res.items || [];
-      this.books = books.map((book: any) => ({
-        id: book.id,
-        name: book.name,
-        quantity: book.quantity,
-        author: book.author,
-        isbn: book.isbn,
-        publishedYear: book.publishedYear,
-        description: book.description,
-        coverImageUrl: book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image',
-        isAvailable: book.quantity > 0
-      }));
-      this.totalCount = res.totalCount || 0;
-    },
-    error: (err) => {
-      this.errorMessage = 'Failed to load books.';
-    }
-  });
-}
+        this.borrowedBooks = filteredBooks.map((book: any) => book.bookId || book.id);
 
-
- loadBorrowedBooks(callback?: () => void): void {
-  this.bookService.getMyCurrentlyBorrowedBooks().subscribe({
-    next: (res: any) => {
-      const allBooks = res?.items || res?.data || res || [];
-     
-      this.borrowedBooks = allBooks.filter((book: any) =>
-        book.statusBook !== 'Returned' && book.statusBook !== 'returned'
-      );
-      if (callback) callback();
-    },
-    error: () => {
-      this.borrowedBooks = [];
-      if (callback) callback();
-    }
-  });
-}
-
+        if (callback) callback();
+      },
+      error: () => {
+        this.borrowedBooks = [];
+        if (callback) callback();
+      }
+    });
+  }
 
   hasBorrowedThisBook(bookId: number): boolean {
-    return this.borrowedBooks.some(book => book.bookId === bookId || book.id === bookId);
+    return this.borrowedBooks.includes(bookId);
   }
 
   hasAnyBorrowedBook(): boolean {
     return this.borrowedBooks.length > 0;
   }
 
- 
-borrow(id: number) {
-  if (this.hasAnyBorrowedBook()) {
-    alert('You cannot borrow another book until you return your current borrowed book.');
-    return;
-  }
+  handleBorrowOrReturn(book: EditableBook) {
+    if (!this.isLoggedIn) {
+      book.message = 'Please log in to borrow books.';
+      this.clearBookMessageAfterDelay(book);
+      this.router.navigate(['/login']);
+      return;
+    }
 
-  this.bookService.borrowBook(id).subscribe({
-    next: () => {
-      alert('Book borrowed successfully.');
-      this.loadBorrowedBooks(() => {
-       
-        const borrowedBook = this.books.find(b => b.id === id);
-        if (borrowedBook) {
-          borrowedBook.quantity -= 1;
-          borrowedBook.isAvailable = borrowedBook.quantity > 0;
-        }
-        this.loadBooks(); 
-      });
-    },
-    error: () => alert('Borrow failed.')
-  });
-}
+    if (this.hasBorrowedThisBook(book.id)) {
+      this.return(book.id);
+    } else {
+      if (this.hasAnyBorrowedBook()) {
+        book.message = 'You cannot borrow another book until you return your current borrowed book.';
+        this.clearBookMessageAfterDelay(book);
+        return;
+      }
 
-
-return(id: number) {
-  const userId = this.auth.getUserId();
-
-  this.bookService.returnBook(id).subscribe({
-    next: () => {
-      alert('Book returned successfully.');
-      this.loadBorrowedBooks(() => {
-        
-        const returnedBook = this.books.find(b => b.id === id);
-        if (returnedBook) {
-          returnedBook.quantity += 1;
-          returnedBook.isAvailable = returnedBook.quantity > 0;
-        }
-        this.loadBooks(); 
-      });
-    },
-    error: () => alert('Failed to return book.')
-  });
-}
-
-  deleteBook(id: number) {
-    if (confirm('Are you sure you want to delete this book?')) {
-      this.bookService.deleteBook(id).subscribe({
-        next: () => this.loadBooks(),
-        error: () => alert('Failed to delete book.')
-      });
+      this.borrow(book.id);
     }
   }
 
-  startEdit(book: EditableBook) {
-    this.editModeId = book.id;
-    this.editBookData = { ...book };
+  borrow(id: number) {
+    this.bookService.borrowBook(id).subscribe({
+      next: () => {
+        const book = this.books.find(b => b.id === id);
+        if (book) {
+          book.quantity -= 1;
+          book.isAvailable = book.quantity > 0;
+          book.message = 'Book borrowed successfully.';
+
+          this.loadBorrowedBooks();
+          this.clearBookMessageAfterDelay(book);
+        }
+      },
+      error: () => {
+        const book = this.books.find(b => b.id === id);
+        if (book) {
+          book.message = 'Borrow failed.';
+          this.clearBookMessageAfterDelay(book);
+        }
+      }
+    });
   }
 
-  cancelEdit() {
-    this.editModeId = null;
-    this.editBookData = {
-      id: 0, name: '', quantity: 0, author: '', isbn: '',
-      publishedYear: 0, description: '', coverImageUrl: '', isAvailable: false
-    };
+  return(id: number) {
+    this.bookService.returnBook(id).subscribe({
+      next: () => {
+        const book = this.books.find(b => b.id === id);
+        if (book) {
+          book.quantity += 1;
+          book.isAvailable = book.quantity > 0;
+          book.message = 'Book returned successfully.';
+
+          this.loadBorrowedBooks();
+          this.clearBookMessageAfterDelay(book);
+        }
+      },
+      error: () => {
+        const book = this.books.find(b => b.id === id);
+        if (book) {
+          book.message = 'Failed to return book.';
+          this.clearBookMessageAfterDelay(book);
+        }
+      }
+    });
+  }
+
+  clearBookMessageAfterDelay(book: EditableBook) {
+    setTimeout(() => {
+      book.message = '';
+    }, 5000);
+  }
+
+  openEditModal(book: EditableBook) {
+    this.editBookData = { ...book };
+    if (this.modalInstance) {
+      this.modalInstance.show();
+    }
   }
 
   saveEdit() {
-    if (!this.editBookData.id || this.editBookData.quantity < 1 || this.editBookData.name.length < 3) {
-      alert('Please provide valid book details');
+    if (
+      !this.editBookData.id ||
+      !this.editBookData.name.trim() ||
+      !this.editBookData.author.trim() ||
+      !this.editBookData.isbn.trim() ||
+      !this.editBookData.publishedYear ||
+      !this.editBookData.coverImageUrl.trim() ||
+      !this.editBookData.description.trim() ||
+      this.editBookData.quantity < 1
+    ) {
+      this.showMessage('error', 'All fields are required and quantity must be at least 1.');
       return;
     }
 
@@ -190,11 +219,11 @@ return(id: number) {
       bookId: this.editBookData.id,
       name: this.editBookData.name.trim(),
       quantity: this.editBookData.quantity,
-      author: this.editBookData.author,
-      isbn: this.editBookData.isbn,
+      author: this.editBookData.author.trim(),
+      isbn: this.editBookData.isbn.trim(),
       publishedYear: this.editBookData.publishedYear,
-      description: this.editBookData.description,
-      coverImageUrl: this.editBookData.coverImageUrl,
+      description: this.editBookData.description.trim(),
+      coverImageUrl: this.editBookData.coverImageUrl.trim(),
       isDeleted: false
     };
 
@@ -202,51 +231,82 @@ return(id: number) {
       next: (res: any) => {
         if (res?.isSuccess) {
           this.loadBooks();
-          this.cancelEdit();
+          this.showMessage('success', 'Book updated successfully.');
+          if (this.modalInstance) {
+            this.modalInstance.hide();
+          }
         } else {
-          alert(res?.message || 'Failed to update book.');
+          this.showMessage('error', res?.message || 'Failed to update book.');
         }
       },
-      error: (err) => {
-        // console.error('Failed to update:', err);
-        alert('Update failed. Please try again.');
+      error: () => {
+        this.showMessage('error', 'Update failed. Please try again.');
       }
     });
   }
 
-  // Pagination
-  get pagedBooks() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.books.slice(start, end);
+  confirmDeleteBook(book: EditableBook) {
+    this.selectedBookToDelete = book;
+    if (this.deleteModalInstance) {
+      this.deleteModalInstance.show();
+    }
   }
 
-get totalPages() {
-  return Math.ceil(this.totalCount / this.pageSize);
-}
+  deleteBookConfirmed() {
+    if (!this.selectedBookToDelete) return;
+
+    this.bookService.deleteBook(this.selectedBookToDelete.id).subscribe({
+      next: () => {
+        this.showMessage('success', 'Book deleted successfully.');
+        this.loadBooks();
+        this.selectedBookToDelete = null;
+        if (this.deleteModalInstance) this.deleteModalInstance.hide();
+      },
+      error: () => {
+        this.showMessage('error', 'Failed to delete book.');
+        if (this.deleteModalInstance) this.deleteModalInstance.hide();
+      }
+    });
+  }
+
+  private showMessage(type: 'success' | 'error', message: string) {
+    if (type === 'success') {
+      this.successMessage = message;
+    } else {
+      this.errorMessage = message;
+    }
+    setTimeout(() => {
+      if (type === 'success') this.successMessage = '';
+      else this.errorMessage = '';
+    }, 3000);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.totalCount / this.pageSize);
+  }
 
   get pagesArray() {
     return Array(this.totalPages).fill(0).map((_, i) => i + 1);
   }
-previousPage() {
-  if (this.currentPage > 1) {
-    this.currentPage--;
-    this.loadBooks(this.currentPage); 
-  }
-}
 
-nextPage() {
-  if (this.currentPage < this.totalPages) {
-    this.currentPage++;
-    this.loadBooks(this.currentPage); 
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadBooks(this.currentPage);
+    }
   }
-}
 
-goToPage(page: number) {
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
-    this.loadBooks(this.currentPage); 
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadBooks(this.currentPage);
+    }
   }
-}
 
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadBooks(this.currentPage);
+    }
+  }
 }

@@ -1,16 +1,19 @@
-<div class="container ">
+<div class="container">
   <h2 class="mb-4">Book List</h2>
 
-  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show mt-2">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mt-2">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
 
   <div class="row">
     <div *ngFor="let book of books" class="col-md-4 col-sm-6 mb-4">
       <div class="card h-100 shadow-sm">
-        <img 
-          [src]="book.coverImageUrl || 'https://dummyimage.com/150x220/cccccc/000000&text=No+Image'" 
-          alt="Book Image" 
-        />
-
+        <img [src]="book.coverImageUrl" alt="Book Image" class="card-img-top"/>
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ book.name }}</h5>
           <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
@@ -19,104 +22,28 @@
           <p class="card-text">{{ book.description }}</p>
           <p class="card-text">Quantity: {{ book.quantity }}</p>
 
-          <span class="badge mb-2"
-                [ngClass]="{
-                  'bg-success': book.quantity > 0,
-                  'bg-danger': book.quantity <= 0
-                }">
+          <span class="badge mb-2" [ngClass]="{ 'bg-success': book.quantity > 0, 'bg-danger': book.quantity <= 0 }">
             {{ book.quantity > 0 ? 'Available' : 'Not Available' }}
           </span>
 
+          <div *ngIf="book.message" class="alert alert-info p-1 mt-1 mb-2">
+            {{ book.message }}
+          </div>
+
           <div class="mt-auto d-flex flex-wrap gap-2">
-
-            <button 
-              *ngIf="isLoggedIn && !isAdmin && !hasBorrowedThisBook(book.id)"
-              [disabled]="book.quantity <= 0"
-              (click)="borrow(book.id)"
-              class="btn btn-primary btn-sm">
-              {{ book.quantity > 0 ? 'Borrow' : 'Not Available' }}
+            <button
+              *ngIf="!isAdmin"
+              class="btn btn-primary btn-sm"
+              [ngClass]="hasBorrowedThisBook(book.id) ? 'btn-warning' : 'btn-primary'"
+              [disabled]="!book.isAvailable && !hasBorrowedThisBook(book.id)"
+              (click)="handleBorrowOrReturn(book)">
+              {{ hasBorrowedThisBook(book.id) ? 'Return' : (book.quantity > 0 ? 'Borrow' : 'Not Available') }}
             </button>
 
-            <button 
-              *ngIf="isLoggedIn && !isAdmin && hasBorrowedThisBook(book.id)"
-              class="btn btn-warning btn-sm"
-              (click)="return(book.id)">
-              <i class="bi bi-arrow-return-left me-1"></i> Return
-            </button>
-
-            <button 
-              class="btn btn-info btn-sm"
-              [routerLink]="['/details', book.id]">
-              Details
-            </button>
-
-            <div *ngIf="!isLoggedIn" class="text-muted small">Login to borrow</div>
-
-            <button *ngIf="isAdmin && editModeId !== book.id"
-                    class="btn btn-outline-danger btn-sm w-100"
-                    (click)="deleteBook(book.id)">
-              Delete
-            </button>
-
-            <button *ngIf="isAdmin && editModeId !== book.id"
-                    class="btn btn-outline-info btn-sm w-100"
-                    (click)="startEdit(book)">
-              Edit
-            </button>
-
+            <button class="btn btn-info btn-sm" [routerLink]="['/details', book.id]">Details</button>
+            <button *ngIf="isAdmin" class="btn btn-outline-info btn-sm w-100" (click)="openEditModal(book)">Edit</button>
+            <button *ngIf="isAdmin" class="btn btn-outline-danger btn-sm w-100" (click)="confirmDeleteBook(book)">Delete</button>
           </div>
-
-          <div *ngIf="editModeId === book.id" class="mt-3">
-            <form (ngSubmit)="saveEdit()" class="d-flex flex-column gap-2">
-              <input [(ngModel)]="editBookData.name"
-                     name="editName{{book.id}}"
-                     class="form-control"
-                     placeholder="Book Name"
-                     required />
-
-              <input [(ngModel)]="editBookData.author"
-                     name="editAuthor{{book.id}}"
-                     class="form-control"
-                     placeholder="Author"
-                     required />
-
-              <input [(ngModel)]="editBookData.isbn"
-                     name="editIsbn{{book.id}}"
-                     class="form-control"
-                     placeholder="ISBN"
-                     required />
-
-              <input [(ngModel)]="editBookData.publishedYear"
-                     name="editPublished{{book.id}}"
-                     type="number"
-                     class="form-control"
-                     placeholder="Published Year"
-                     required />
-
-              <input [(ngModel)]="editBookData.quantity"
-                     name="editQuantity{{book.id}}"
-                     type="number"
-                     class="form-control"
-                     placeholder="Quantity"
-                     required min="0" />
-
-              <textarea [(ngModel)]="editBookData.description"
-                        name="editDescription{{book.id}}"
-                        class="form-control"
-                        placeholder="Description"></textarea>
-
-              <input [(ngModel)]="editBookData.coverImageUrl"
-                     name="editCoverImage{{book.id}}"
-                     class="form-control"
-                     placeholder="Cover Image URL" />
-
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success btn-sm w-100">Save</button>
-                <button type="button" class="btn btn-secondary btn-sm w-100" (click)="cancelEdit()">Cancel</button>
-              </div>
-            </form>
-          </div>
-
         </div>
       </div>
     </div>
@@ -138,4 +65,61 @@
       </li>
     </ul>
   </nav>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editBookModal" #editBookModal tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="saveEdit()">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Book</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3"><label class="form-label">Book Name</label>
+              <input [(ngModel)]="editBookData.name" name="editName" class="form-control" required /></div>
+            <div class="mb-3"><label class="form-label">Author</label>
+              <input [(ngModel)]="editBookData.author" name="editAuthor" class="form-control" required /></div>
+            <div class="mb-3"><label class="form-label">ISBN</label>
+              <input [(ngModel)]="editBookData.isbn" name="editIsbn" class="form-control" required /></div>
+            <div class="mb-3"><label class="form-label">Published Year</label>
+              <input [(ngModel)]="editBookData.publishedYear" name="editPublished" type="number" class="form-control" required /></div>
+            <div class="mb-3"><label class="form-label">Quantity</label>
+              <input [(ngModel)]="editBookData.quantity" name="editQuantity" type="number" class="form-control" required min="0" /></div>
+            <div class="mb-3"><label class="form-label">Description</label>
+              <textarea [(ngModel)]="editBookData.description" name="editDescription" class="form-control"></textarea></div>
+            <div class="mb-3"><label class="form-label">Cover Image URL</label>
+              <input [(ngModel)]="editBookData.coverImageUrl" name="editCoverImage" class="form-control" /></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteConfirmModal" #deleteConfirmModal tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong>{{ selectedBookToDelete?.name }}</strong>?</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteBookConfirmed()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
